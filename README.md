@@ -2,9 +2,8 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/yourusername/njcensus/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/yourusername/njcensus/actions/workflows/R-CMD-check.yaml) [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![R-CMD-check](https://github.com/PrigasG/njcensus/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/PrigasG/njcensus/actions/workflows/R-CMD-check.yaml)
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![R-CMD-check](https://github.com/yourusername/njcensus/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/yourusername/njcensus/actions/workflows/R-CMD-check.yaml) [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental) [![R-CMD-check](https://github.com/PrigasG/njcensus/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/PrigasG/njcensus/actions/workflows/R-CMD-check.yaml) [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+
 <!-- badges: end -->
 
 ## Overview
@@ -25,7 +24,7 @@ You can install the development version of njcensus from GitHub with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("yourusername/njcensus")
+devtools::install_github("prigasG/njcensus")
 ```
 
 ## Usage
