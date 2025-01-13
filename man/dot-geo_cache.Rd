@@ -3,23 +3,14 @@
 \docType{data}
 \name{.geo_cache}
 \alias{.geo_cache}
-\title{Get New Jersey Geographic Reference Data}
+\title{Geographic Reference Data Cache}
 \format{
 An object of class \code{environment} of length 0.
 }
 \usage{
 .geo_cache
 }
-\arguments{
-\item{year}{Census year (2010 or 2020)}
-}
-\value{
-A data frame containing geographic reference information
-}
 \description{
-Creates geographic reference data for New Jersey counties and municipalities
+Geographic Reference Data Cache
 }
-\examples{
-geo_ref <- get_nj_geo_reference(2020)
-}
-\keyword{datasets}
+\keyword{internal}

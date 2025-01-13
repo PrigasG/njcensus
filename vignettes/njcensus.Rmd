@@ -1,8 +1,8 @@
 ---
-title: "njcensus"
+title: "Getting Started with njcensus"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{njcensus}
+  %\VignetteIndexEntry{Getting Started with njcensus}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,4 +16,148 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(njcensus)
+library(dplyr)
+```
+
+## Introduction
+
+The njcensus package provides tools for working with New Jersey Census demographic data. It supports both 2010 and 2020 census years and offers functions for downloading, processing, and analyzing population data by race and gender across counties and municipalities.
+
+## Getting Started
+
+### Initialize the Database
+
+Before retrieving any data, you need to initialize the census database:
+
+``` r
+init_census_data()
+```
+
+This function:
+
+Creates a DuckDB database file Downloads and processes both 2010 and 2020 census data Sets up the necessary tables for querying
+
+## Basic Data Retrieval
+
+To retrieve data for a specific demographic group and year:
+
+``` r
+# Get data for white males in 2020
+white_male_2020 <- get_census_data("white", "male", 2020)
+
+# View the first few rows
+head(white_male_2020)
+```
+
+## Available Demographics
+
+The package supports these demographic groups:
+
+-   white
+-   boaa (Black or African American)
+-   aian (American Indian and Alaska Native)
+-   asian
+-   nhpi (Native Hawaiian and Pacific Islander)
+-   others
+-   two_more (Two or more races)
+
+## Example Analyses
+
+## Population Distribution by County
+
+``` r
+# Get Asian population data for 2020
+asian_male_2020 <- get_census_data("asian", "male", 2020)
+asian_female_2020 <- get_census_data("asian", "female", 2020)
+
+# Combine and analyze by county
+asian_by_county <- asian_male_2020 %>%
+  full_join(asian_female_2020, by = c("county", "county_name")) %>%
+  group_by(county_name) %>%
+  summarize(
+    total_population = sum(Total_Male, Total_Female, na.rm = TRUE)
+  ) %>%
+  arrange(desc(total_population))
+
+head(asian_by_county)
+```
+
+## Age Distribution Analysis
+
+``` r
+# Get data for a specific demographic
+data <- get_census_data("white", "male", 2020)
+
+# Analyze age distribution
+age_distribution <- data %>%
+  select(matches("_years$")) %>%
+  summarize(across(everything(), sum)) %>%
+  tidyr::pivot_longer(everything(), 
+                     names_to = "age_group", 
+                     values_to = "count")
+
+# View the first few age groups
+head(age_distribution)
+```
+
+## Working with Multiple Years
+
+Compare population changes between 2010 and 2020:
+
+``` r
+# Get data for both years
+data_2010 <- get_census_data("asian", "female", 2010)
+data_2020 <- get_census_data("asian", "female", 2020)
+
+# Calculate population change by county
+population_change <- data_2010 %>%
+  select(county_name, Total_Female) %>%
+  rename(pop_2010 = Total_Female) %>%
+  full_join(
+    data_2020 %>%
+      select(county_name, Total_Female) %>%
+      rename(pop_2020 = Total_Female),
+    by = "county_name"
+  ) %>%
+  mutate(
+    change = pop_2020 - pop_2010,
+    percent_change = (change / pop_2010) * 100
+  ) %>%
+  arrange(desc(percent_change))
+
+head(population_change)
+```
+
+## Advanced Usage
+
+### Custom Database Path
+
+You can specify a custom location for the census database:
+
+``` r
+# Set custom database path
+set_db_path("/path/to/your/census_data.duckdb")
+
+# Get current database path
+get_db_path()
+```
+
+## Refreshing the Database
+
+To update or rebuild the database:
+
+``` r
+init_census_data(force_refresh = TRUE)
+```
+
+## Tips and Best Practices
+
+1.  **Memory Management:** The package uses DuckDB for efficient data storage and retrieval. For large queries, consider using dplyr's lazy evaluation.
+2.  **Database Connection:** The package handles database connections automatically. You don't need to manage connections manually.
+3.  **Error Handling:** All functions include input validation and informative error messages.
+
+## Session Info
+
+``` r
+sessionInfo()
 ```

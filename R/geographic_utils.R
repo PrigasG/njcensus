@@ -1,3 +1,8 @@
+#' Geographic Reference Data Cache
+#'
+#' @keywords internal
+.geo_cache <- new.env()
+
 #' Get New Jersey Geographic Reference Data
 #'
 #' @description Creates geographic reference data for New Jersey counties and municipalities
@@ -8,16 +13,15 @@
 #' @import dplyr
 #' @export
 #' @examples
+#' \dontrun{
 #' geo_ref <- get_nj_geo_reference(2020)
-## Add caching to geographic reference data
-.geo_cache <- new.env()
-
+#' }
 get_nj_geo_reference <- function(year) {
   cache_key <- paste0("geo_ref_", year)
-
   if(exists(cache_key, envir = .geo_cache)) {
     return(get(cache_key, envir = .geo_cache))
   }
+
   nj_counties <- tigris::counties(state = "NJ", cb = TRUE, year = year) %>%
     sf::st_as_sf() %>%
     sf::st_transform(crs = 4326) %>%
