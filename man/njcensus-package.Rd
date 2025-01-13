@@ -11,7 +11,7 @@ Provides tools for downloading, processing, and analyzing New Jersey census demo
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/PrigasG/njcensus}
+  \item \url{https://prigasg.github.io/njcensus}
   \item Report bugs at \url{https://github.com/PrigasG/njcensus/issues}
 }
 
