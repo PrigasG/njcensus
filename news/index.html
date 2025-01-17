@@ -39,14 +39,29 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="njcensus-020">njcensus 0.2.0<a class="anchor" aria-label="anchor" href="#njcensus-020"></a></h2>
+<div class="section level3">
+<h3 id="major-changes-0-2-0">Major changes<a class="anchor" aria-label="anchor" href="#major-changes-0-2-0"></a></h3>
+<ul><li>Added pre-packaged census data support to improve reliability and speed</li>
+<li>Modified <code><a href="../reference/init_census_data.html">init_census_data()</a></code> to use packaged data by default</li>
+</ul></div>
+<div class="section level3">
+<h3 id="features-0-2-0">Features<a class="anchor" aria-label="anchor" href="#features-0-2-0"></a></h3>
+<ul><li>New parameter <code>use_packaged_data</code> in <code><a href="../reference/init_census_data.html">init_census_data()</a></code>
+</li>
+<li>Improved database initialization stability</li>
+<li>Reduced dependency on Census API</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-and-improvements-0-2-0">Bug fixes and improvements<a class="anchor" aria-label="anchor" href="#bug-fixes-and-improvements-0-2-0"></a></h3>
+<ul><li>Added proper system dependencies</li>
+<li>Improved error handling in database operations</li>
+<li>Enhanced test coverage</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="njcensus-010">njcensus 0.1.0<a class="anchor" aria-label="anchor" href="#njcensus-010"></a></h2>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.0.0.9000" id="njcensus-0009000-development-version">njcensus 0.0.0.9000 (Development version)<a class="anchor" aria-label="anchor" href="#njcensus-0009000-development-version"></a></h2>
 <div class="section level3">
-<h3 id="new-features-0-0-0-9000">New features<a class="anchor" aria-label="anchor" href="#new-features-0-0-0-9000"></a></h3>
+<h3 id="new-features-0-1-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-1-0"></a></h3>
 <ul><li>Added initial database operations with <code><a href="../reference/init_census_data.html">init_census_data()</a></code> and <code><a href="../reference/get_census_data.html">get_census_data()</a></code>
 </li>
 <li>Implemented Census API data retrieval for 2010 and 2020</li>
@@ -54,12 +69,12 @@
 <li>Created DuckDB backend for efficient data storage</li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-0-0-9000">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-0-9000"></a></h3>
+<h3 id="bug-fixes-0-1-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-0"></a></h3>
 <ul><li>Fixed database path handling in test environments</li>
 <li>Corrected memory limit settings in DuckDB configuration</li>
 </ul></div>
 <div class="section level3">
-<h3 id="documentation-0-0-0-9000">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-0-0-9000"></a></h3>
+<h3 id="documentation-0-1-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-1-0"></a></h3>
 <ul><li>Added comprehensive vignette with examples</li>
 <li>Created README with installation and basic usage instructions</li>
 </ul></div>
