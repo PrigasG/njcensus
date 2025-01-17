@@ -1,3 +1,5 @@
+# njcensus 0.2.0
+
 # njcensus 0.1.0
 
 # njcensus 0.0.0.9000 (Development version)
