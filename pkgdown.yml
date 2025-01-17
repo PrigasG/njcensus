@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   njcensus: njcensus.html
-last_built: 2025-01-16T10:27Z
+last_built: 2025-01-17T13:22Z
 urls:
   reference: https://prigasg.github.io/njcensus/reference
   article: https://prigasg.github.io/njcensus/articles
