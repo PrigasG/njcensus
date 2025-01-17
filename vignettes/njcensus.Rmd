@@ -29,13 +29,34 @@ The njcensus package provides tools for working with New Jersey Census demograph
 
 Before retrieving any data, you need to initialize the census database:
 
-``` r
-init_census_data()
+## Getting Started
+
+### Initialize the Database
+
+There are two ways to initialize the census database:
+
+1. Using pre-packaged data (recommended):
+```r
+init_census_data()  # Uses included data
 ```
 
 This function:
 
 Creates a DuckDB database file Downloads and processes both 2010 and 2020 census data Sets up the necessary tables for querying
+
+2. Fetching fresh data from Census API:
+
+```r
+init_census_data(use_packaged_data = FALSE)
+```
+
+The pre-packaged data approach is recommended because:
+
+* It's significantly faster
+* Doesn't depend on API availability
+* Works without internet connection
+* Avoids API rate limits
+* Census data for 2010 and 2020 is static
 
 ## Basic Data Retrieval
 
@@ -142,12 +163,12 @@ set_db_path("/path/to/your/census_data.duckdb")
 get_db_path()
 ```
 
-## Refreshing the Database
+## Updating the Database
 
-To update or rebuild the database:
+To fetch fresh data from the Census API:
 
 ``` r
-init_census_data(force_refresh = TRUE)
+init_census_data(use_packaged_data = FALSE)
 ```
 
 ## Tips and Best Practices

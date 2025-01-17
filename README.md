@@ -24,7 +24,7 @@ You can install the development version of njcensus from GitHub with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("prigasG/njcensus")
+devtools::install_github("PrigasG/njcensus")
 ```
 
 ## Usage
@@ -34,8 +34,11 @@ devtools::install_github("prigasG/njcensus")
 ``` r
 library(njcensus)
 
-# Initialize the census database
+# Initialize using pre-packaged data (recommended)
 init_census_data()
+
+# Or fetch fresh data from Census API (optional)
+init_census_data(use_packaged_data = FALSE)
 
 # Get data for white males in 2020
 white_male_data <- get_census_data("white", "male", 2020)
@@ -43,6 +46,14 @@ white_male_data <- get_census_data("white", "male", 2020)
 # Get data for Asian females in 2010
 asian_female_data <- get_census_data("asian", "female", 2010)
 ```
+
+## Perfomance Note
+The package includes pre-packaged Census data for better performance and reliability:
+
+* Faster initialization
+* No API rate limits
+* Works offline
+* Consistent data access
 
 ## Available Demographics
 
