@@ -57,32 +57,67 @@ get_census_data <- function(demographic = NULL, gender = NULL, year = 2020) {
 
 #' Initialize Census Database
 #'
-#' @description Creates or refreshes the census database with both 2010 and 2020 data
-#' @param force_refresh Logical. If TRUE, recreates database even if it exists
-#' @param worker_threads Integer. Number of threads for parallel processing
-#' @param memory_limit Character. Memory limit for DuckDB (default: "4GB")
-#' @return None. Creates or updates the census database.
+#' @description Creates or initializes the census database with both 2010 and 2020 data.
+#' Either uses pre-packaged data (recommended) or fetches from Census API.
+#'
+#' @param use_packaged_data Logical. If TRUE, uses pre-packaged data. If FALSE, fetches from Census API.
+#' @param worker_threads Integer. Number of threads for parallel processing when fetching from API.
+#' @param memory_limit Character. Memory limit for DuckDB (default: "4GB").
+#'
+#' @details
+#' The function provides two methods of initializing the census database:
+#' 1. Using pre-packaged data (faster, reliable, no API limits)
+#' 2. Fetching from Census API (for custom updates)
+#'
+#' Pre-packaged data is recommended for most users as:
+#' - It's faster to initialize
+#' - Doesn't depend on API availability
+#' - Avoids API rate limits
+#' - Census data for 2010 and 2020 is static
+#'
+#' @return None. Creates or initializes the census database.
 #' @export
+#'
 #' @examples
 #' \dontrun{
+#' # Use pre-packaged data (recommended)
 #' init_census_data()
-#' init_census_data(force_refresh = TRUE)
-#' init_census_data(force_refresh = TRUE, worker_threads = 4, memory_limit = "8GB")
+#'
+#' # Fetch fresh data from Census API
+#' init_census_data(use_packaged_data = FALSE)
+#'
+#' # Customize API fetch settings
+#' init_census_data(
+#'   use_packaged_data = FALSE,
+#'   worker_threads = 4,
+#'   memory_limit = "8GB"
+#' )
 #' }
-init_census_data <- function(force_refresh = FALSE,
+init_census_data <- function(use_packaged_data = TRUE,
                              worker_threads = parallel::detectCores() - 1,
                              memory_limit = "4GB") {
+  if(use_packaged_data) {
+    # Use included database
+    source_db_path <- system.file("extdata", "census_data.duckdb", package = "njcensus")
+    target_db_path <- Sys.getenv("CENSUS_DB_PATH", "census_data.duckdb")
 
-  db_path <- Sys.getenv("CENSUS_DB_PATH", "census_data.duckdb")
-
-  if(force_refresh || !file.exists(db_path)) {
+    if(!file.exists(target_db_path)) {
+      message("Copying packaged census database...")
+      file.copy(source_db_path, target_db_path)
+      message("Census database ready to use at ", target_db_path)
+    } else {
+      message("Using existing census database at ", target_db_path)
+    }
+  } else {
+    # Use API to fetch data
+    db_path <- Sys.getenv("CENSUS_DB_PATH", "census_data.duckdb")
     message("Fetching census data for 2010 and 2020... This may take a few minutes.")
 
     tryCatch({
       con <- dbConnect(duckdb::duckdb(), dbdir = db_path)
       on.exit(dbDisconnect(con, shutdown = TRUE))
 
-      # Explicitly set memory limit
+      # Configure database
       dbExecute(con, sprintf("SET memory_limit='%s'", memory_limit))
       dbExecute(con, sprintf("SET threads=%d", worker_threads))
 
@@ -94,12 +129,11 @@ init_census_data <- function(force_refresh = FALSE,
       process_census_data(2010)
       process_census_data(2020)
 
+      message("Census database ready to use at ", db_path)
     }, error = function(e) {
       stop("Error initializing database: ", e$message)
     })
   }
-
-  message("Census database ready to use at ", db_path)
 }
 
 #' Get Database Path
@@ -127,3 +161,5 @@ set_db_path <- function(path) {
   Sys.setenv(CENSUS_DB_PATH = path)
   invisible(path)
 }
+
+

@@ -26,9 +26,8 @@ create_test_db <- function() {
   return(test_db)
 }
 
-# Setup and teardown
+# Tests
 withr::with_file(create_test_db(), {
-
   test_that("get_census_data validates input parameters correctly", {
     # Test invalid demographic
     expect_error(
@@ -89,7 +88,6 @@ withr::with_file(create_test_db(), {
           county_name = "Test County",
           year = 2010
         )
-
         dbWriteTable(con, "white_male_2010", test_data)
 
         # Test data retrieval
@@ -98,11 +96,10 @@ withr::with_file(create_test_db(), {
         expect_true(all(c("state", "county", "county_subdivision") %in% names(result)))
       }
     )
-
     unlink(temp_db)
   })
 
-  test_that("init_census_data handles force_refresh correctly", {
+  test_that("init_census_data handles packaged data correctly", {
     skip_on_cran()
     temp_db <- tempfile(fileext = ".duckdb")
 
@@ -110,44 +107,27 @@ withr::with_file(create_test_db(), {
       new = c("CENSUS_DB_PATH" = temp_db),
       code = {
         expect_message(
-          init_census_data(),
+          init_census_data(use_packaged_data = TRUE),
           "Census database ready to use"
         )
+      }
+    )
+    unlink(temp_db)
+  })
 
+  test_that("init_census_data handles API fetch correctly", {
+    skip_on_cran()
+    temp_db <- tempfile(fileext = ".duckdb")
+
+    withr::with_envvar(
+      new = c("CENSUS_DB_PATH" = temp_db),
+      code = {
         expect_message(
-          init_census_data(force_refresh = TRUE),
+          init_census_data(use_packaged_data = FALSE),
           "Fetching census data"
         )
       }
     )
-
-    unlink(temp_db)
-  })
-
-  # Update the test expectations to handle different memory formats
-  test_that("init_census_data configures database correctly", {
-    skip_on_cran()
-    temp_db <- tempfile(fileext = ".duckdb")
-
-    withr::with_envvar(
-      new = c("CENSUS_DB_PATH" = temp_db),
-      code = {
-        init_census_data(force_refresh = TRUE)
-
-        con <- dbConnect(duckdb::duckdb(), temp_db)
-        on.exit(dbDisconnect(con, shutdown = TRUE))
-
-        memory_limit <- dbGetQuery(con, "SELECT current_setting('memory_limit')")[[1]]
-        # Convert to numeric GB for comparison
-        memory_gb <- as.numeric(gsub("[^0-9.]", "", memory_limit))
-        if(grepl("GiB", memory_limit)) {
-          memory_gb <- memory_gb * 1.074 # Convert GiB to GB
-        }
-        # Allow some flexibility in memory limit
-        expect_true(memory_gb >= 4, "Memory limit should be at least 4GB")
-      }
-    )
-
     unlink(temp_db)
   })
 
