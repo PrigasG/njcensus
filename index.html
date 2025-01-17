@@ -82,7 +82,7 @@
 <p>You can install the development version of njcensus from GitHub with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"prigasG/njcensus"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"PrigasG/njcensus"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
@@ -93,8 +93,11 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://prigasg.github.io/njcensus">njcensus</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Initialize the census database</span></span>
+<span><span class="co"># Initialize using pre-packaged data (recommended)</span></span>
 <span><span class="fu"><a href="reference/init_census_data.html">init_census_data</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Or fetch fresh data from Census API (optional)</span></span>
+<span><span class="fu"><a href="reference/init_census_data.html">init_census_data</a></span><span class="op">(</span>use_packaged_data <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get data for white males in 2020</span></span>
 <span><span class="va">white_male_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_census_data.html">get_census_data</a></span><span class="op">(</span><span class="st">"white"</span>, <span class="st">"male"</span>, <span class="fl">2020</span><span class="op">)</span></span>
@@ -102,6 +105,17 @@
 <span><span class="co"># Get data for Asian females in 2010</span></span>
 <span><span class="va">asian_female_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_census_data.html">get_census_data</a></span><span class="op">(</span><span class="st">"asian"</span>, <span class="st">"female"</span>, <span class="fl">2010</span><span class="op">)</span></span></code></pre></div>
 </div>
+</div>
+<div class="section level2">
+<h2 id="perfomance-note">Perfomance Note<a class="anchor" aria-label="anchor" href="#perfomance-note"></a>
+</h2>
+<p>The package includes pre-packaged Census data for better performance and reliability:</p>
+<ul>
+<li>Faster initialization</li>
+<li>No API rate limits</li>
+<li>Works offline</li>
+<li>Consistent data access</li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="available-demographics">Available Demographics<a class="anchor" aria-label="anchor" href="#available-demographics"></a>
