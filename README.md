@@ -73,7 +73,7 @@ Process census data for a specific year:
 
 ``` r
 # Process 2020 census data
-process_census_data(`2020`)
+process_census_data(2020)
 ```
 
 Querying demographic data
@@ -83,7 +83,7 @@ Querying demographic data
 data <- get_census_data(
   demographic = "asian",
   gender = "female",
-  year = `2020`
+  year = 2020
 )
 
 # View the first few rows
