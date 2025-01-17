@@ -1,8 +1,23 @@
 # njcensus 0.2.0
 
-# njcensus 0.1.0
+## Major changes
 
-# njcensus 0.0.0.9000 (Development version)
+-   Added pre-packaged census data support to improve reliability and speed
+-   Modified `init_census_data()` to use packaged data by default
+
+## Features
+
+-   New parameter `use_packaged_data` in `init_census_data()`
+-   Improved database initialization stability
+-   Reduced dependency on Census API
+
+## Bug fixes and improvements
+
+-   Added proper system dependencies
+-   Improved error handling in database operations
+-   Enhanced test coverage
+
+# njcensus 0.1.0
 
 ## New features
 
