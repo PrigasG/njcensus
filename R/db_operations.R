@@ -1,58 +1,85 @@
 #' Read Census Data from DuckDB
 #'
-#' @description Retrieves census data for specified demographic group, gender, and year
-#' @param demographic Character. Demographic group (e.g., "white", "asian", "boaa")
-#' @param gender Character. Gender ("male" or "female")
-#' @param year Numeric. Census year (2010 or 2020)
+#' @description Retrieves census data for specified demographic group, gender, and year.
+#' If no specific parameters are provided, returns a preview of all demographics.
+#' @param demographic Character. Demographic group (e.g., "white", "asian", "boaa").
+#'        If NULL, returns preview of all groups.
+#' @param gender Character. Gender ("male" or "female"). Defaults to "male".
+#' @param year Numeric. Census year (2010 or 2020). Defaults to 2020.
+#' @param preview_limit Numeric. Number of rows to return when no demographic specified.
+#'        Defaults to 10.
 #' @return A data frame containing the requested census data
 #' @import DBI
 #' @import duckdb
 #' @export
 #' @examples
 #' \dontrun{
-#' white_male_2020 <- get_census_data("white", "male", 2020)
+#' # Get preview of all demographics
+#' preview <- get_census_data()
+#'
+#' # Get data with defaults (white males in 2020)
+#' default_data <- get_census_data("white")
+#'
+#' # Get specific data
 #' asian_female_2010 <- get_census_data("asian", "female", 2010)
 #' }
-get_census_data <- function(demographic = NULL, gender = NULL, year = 2020) {
-  # Validate inputs
+get_census_data <- function(demographic = NULL,
+                            gender = "male",
+                            year = 2020,
+                            preview_limit = 10) {
+  # Define valid options
   valid_demographics <- c("white", "boaa", "aian", "asian", "nhpi", "others", "two_more")
   valid_genders <- c("male", "female")
   valid_years <- c(2010, 2020)
 
-  if(is.null(demographic) || !demographic %in% valid_demographics) {
-    stop("Invalid demographic. Must be one of: ", paste(valid_demographics, collapse = ", "))
-  }
-  if(is.null(gender) || !gender %in% valid_genders) {
-    stop("Invalid gender. Must be one of: ", paste(valid_genders, collapse = ", "))
-  }
+  # Validate and set defaults for gender and year
+  gender <- match.arg(gender, valid_genders)
   if(!year %in% valid_years) {
-    stop("Invalid year. Must be one of: ", paste(valid_years, collapse = ", "))
+    warning("Invalid year. Using default year 2020.")
+    year <- 2020
   }
 
-  # Get database path from environment variable or use default
-  db_path <- Sys.getenv("CENSUS_DB_PATH", "census_data.duckdb")
-
-  if(!file.exists(db_path)) {
-    stop("Census database not found at ", db_path, ". Please run init_census_data() first.")
+  # Check database existence
+  if(!file.exists("census_data.duckdb")) {
+    stop("Census database not found. Please run init_census_data() first.")
   }
 
-  # Try to connect to database
-  tryCatch({
-    con <- dbConnect(duckdb::duckdb(), dbdir = db_path, read_only = FALSE)
-    on.exit(dbDisconnect(con, shutdown = TRUE))
+  # Connect to database
+  con <- dbConnect(duckdb::duckdb(), dbdir = "census_data.duckdb", read_only = FALSE)
+  on.exit(dbDisconnect(con, shutdown = TRUE))
 
-    table_name <- paste(demographic, gender, year, sep = "_")
+  # Handle NULL demographic (preview mode)
+  if(is.null(demographic)) {
+    # Get tables matching the gender and year
+    tables <- dbListTables(con)
+    pattern <- paste0("_", gender, "_", year, "$")
+    relevant_tables <- grep(pattern, tables, value = TRUE)
 
-    if(!dbExistsTable(con, table_name)) {
-      stop(sprintf("Invalid combination of demographic/gender/year: %s", table_name))
+    # Combine data from all tables with limit
+    result <- NULL
+    for(table in relevant_tables) {
+      data <- dbGetQuery(con, sprintf("SELECT * FROM \"%s\" LIMIT %d",
+                                      table, preview_limit))
+      data$demographic <- sub(paste0("_", gender, "_", year), "", table)
+      result <- rbind(result, data)
     }
+    return(result)
+  }
 
-    data <- dbGetQuery(con, sprintf("SELECT * FROM \"%s\"", table_name))
-    return(data)
+  # Validate demographic if provided
+  if(!demographic %in% valid_demographics) {
+    stop("Invalid demographic. Must be one of: ",
+         paste(valid_demographics, collapse = ", "))
+  }
 
-  }, error = function(e) {
-    stop("Error accessing database: ", e$message)
-  })
+  # Get specific data
+  table_name <- paste(demographic, gender, year, sep = "_")
+  if(!dbExistsTable(con, table_name)) {
+    stop(sprintf("Invalid combination of demographic/gender/year: %s", table_name))
+  }
+
+  data <- dbGetQuery(con, sprintf("SELECT * FROM \"%s\"", table_name))
+  return(data)
 }
 
 #' Initialize Census Database
