@@ -2,15 +2,16 @@
 #'
 #' @description Retrieves census data for specified demographic group, gender, and year.
 #' If no specific parameters are provided, returns a preview of all demographics.
+#' Returns data in a formatted table view for easy reading.
+#'
 #' @param demographic Character. Demographic group (e.g., "white", "asian", "boaa").
 #'        If NULL, returns preview of all groups.
 #' @param gender Character. Gender ("male" or "female"). Defaults to "male".
 #' @param year Numeric. Census year (2010 or 2020). Defaults to 2020.
 #' @param preview_limit Numeric. Number of rows to return when no demographic specified.
 #'        Defaults to 10.
-#' @return A data frame containing the requested census data
-#' @import DBI
-#' @import duckdb
+#' @return A data frame of class 'census_data' containing the requested census data,
+#'         with formatted printing capabilities.
 #' @export
 #' @examples
 #' \dontrun{
@@ -35,7 +36,7 @@ get_census_data <- function(demographic = NULL,
   # Validate and set defaults for gender and year
   gender <- match.arg(gender, valid_genders)
   if(!year %in% valid_years) {
-    warning("Invalid year. Using default year 2020.")
+    warning("Invalid decennial year. Using default year 2020.")
     year <- 2020
   }
 
@@ -50,35 +51,38 @@ get_census_data <- function(demographic = NULL,
 
   # Handle NULL demographic (preview mode)
   if(is.null(demographic)) {
-    # Get tables matching the gender and year
     tables <- dbListTables(con)
     pattern <- paste0("_", gender, "_", year, "$")
     relevant_tables <- grep(pattern, tables, value = TRUE)
 
-    # Combine data from all tables with limit
-    result <- NULL
+    result <- data.frame()
     for(table in relevant_tables) {
       data <- dbGetQuery(con, sprintf("SELECT * FROM \"%s\" LIMIT %d",
                                       table, preview_limit))
       data$demographic <- sub(paste0("_", gender, "_", year), "", table)
-      result <- rbind(result, data)
+      result <- if(nrow(result) == 0) data else rbind(result, data)
     }
+
+    # Remove rows with NA in county_name or municipality_name
+    result <- subset(result,
+                     !is.na(county_name) & !is.na(municipality_name))
+
+    class(result) <- unique(c("census_data", class(result)))
     return(result)
   }
 
-  # Validate demographic if provided
-  if(!demographic %in% valid_demographics) {
-    stop("Invalid demographic. Must be one of: ",
-         paste(valid_demographics, collapse = ", "))
-  }
-
-  # Get specific data
+  # get demographic query
   table_name <- paste(demographic, gender, year, sep = "_")
   if(!dbExistsTable(con, table_name)) {
     stop(sprintf("Invalid combination of demographic/gender/year: %s", table_name))
   }
 
   data <- dbGetQuery(con, sprintf("SELECT * FROM \"%s\"", table_name))
+
+  # Remove rows with NA in county_name or municipality_name
+  data <- subset(data, !is.na(county_name) & !is.na(municipality_name))
+
+  class(data) <- unique(c("census_data", class(data)))
   return(data)
 }
 
@@ -189,4 +193,49 @@ set_db_path <- function(path) {
   invisible(path)
 }
 
+#' Print Census Data
+#' @param x Census data frame from get_census_data
+#' @param ... Additional arguments passed to print
+#' @importFrom knitr kable
+#' @export
+print.census_data <- function(x, ...) {
+  # Select relevant columns for display
+  display_cols <- intersect(
+    c("demographic", "county_name", "municipality_name", "Total", "year"),
+    names(x)
+  )
 
+  display_data <- x[, display_cols]
+
+  # Create title with more context
+  title <- if("demographic" %in% names(x)) {
+    sprintf("Census Data Preview (%s, %d)", x$gender[1], x$year[1])
+  } else {
+    sprintf("Census Data for %s (%d)", paste(unique(x$county_name), collapse = ", "), x$year[1])
+  }
+
+  # Format output
+  cat("\n", title, "\n\n")
+
+  if(nrow(display_data) > 0) {
+    if(interactive()) {
+      # Add thousands separator for Total column
+      display_data$Total <- format(display_data$Total, big.mark = ",")
+      print.data.frame(head(display_data, 10), row.names = FALSE)
+    } else {
+      print(knitr::kable(head(display_data, 10),
+                         format = "pipe",
+                         caption = title,
+                         format.args = list(big.mark = ",")))
+    }
+
+    if(nrow(x) > 10) {
+      cat(sprintf("\n... showing first 10 rows of %s total rows\n",
+                  format(nrow(x), big.mark = ",")))
+    }
+  } else {
+    cat("No data available\n")
+  }
+
+  invisible(x)
+}
