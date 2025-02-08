@@ -92,16 +92,6 @@ data by race and gender across counties and municipalities.</p>
 <div class="section level3">
 <h3 id="initialize-the-database">Initialize the Database<a class="anchor" aria-label="anchor" href="#initialize-the-database"></a>
 </h3>
-<p>Before retrieving any data, you need to initialize the census
-database:</p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="getting-started-1">Getting Started<a class="anchor" aria-label="anchor" href="#getting-started-1"></a>
-</h2>
-<div class="section level3">
-<h3 id="initialize-the-database-1">Initialize the Database<a class="anchor" aria-label="anchor" href="#initialize-the-database-1"></a>
-</h3>
 <p>There are two ways to initialize the census database:</p>
 <ol style="list-style-type: decimal">
 <li>Using pre-packaged data (recommended):</li>
@@ -131,11 +121,17 @@ database:</p>
 </h2>
 <p>To retrieve data for a specific demographic group and year:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Get data for white males in 2020</span></span>
-<span><span class="va">white_male_2020</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_census_data.html">get_census_data</a></span><span class="op">(</span><span class="st">"white"</span>, <span class="st">"male"</span>, <span class="fl">2020</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Get preview of all demographics</span></span>
+<span><span class="va">preview</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_census_data.html">get_census_data</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">preview</span>  <span class="co"># Shows formatted table</span></span>
 <span></span>
-<span><span class="co"># View the first few rows</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">white_male_2020</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Use defaults (white males in 2020)</span></span>
+<span><span class="va">default_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_census_data.html">get_census_data</a></span><span class="op">(</span><span class="st">"white"</span><span class="op">)</span></span>
+<span><span class="va">default_data</span>  <span class="co"># Shows formatted table</span></span>
+<span></span>
+<span><span class="co"># Specific query</span></span>
+<span><span class="va">asian_female_2010</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_census_data.html">get_census_data</a></span><span class="op">(</span><span class="st">"asian"</span>, <span class="st">"female"</span>, <span class="fl">2010</span><span class="op">)</span></span>
+<span><span class="va">asian_female_2010</span>  <span class="co"># Shows formatted table</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="available-demographics">Available Demographics<a class="anchor" aria-label="anchor" href="#available-demographics"></a>
@@ -154,10 +150,9 @@ database:</p>
 <div class="section level2">
 <h2 id="example-analyses">Example Analyses<a class="anchor" aria-label="anchor" href="#example-analyses"></a>
 </h2>
-</div>
-<div class="section level2">
-<h2 id="population-distribution-by-county">Population Distribution by County<a class="anchor" aria-label="anchor" href="#population-distribution-by-county"></a>
-</h2>
+<div class="section level3">
+<h3 id="population-distribution-by-county">Population Distribution by County<a class="anchor" aria-label="anchor" href="#population-distribution-by-county"></a>
+</h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get Asian population data for 2020</span></span>
 <span><span class="va">asian_male_2020</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_census_data.html">get_census_data</a></span><span class="op">(</span><span class="st">"asian"</span>, <span class="st">"male"</span>, <span class="fl">2020</span><span class="op">)</span></span>
@@ -173,6 +168,7 @@ database:</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">total_population</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">asian_by_county</span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="age-distribution-analysis">Age Distribution Analysis<a class="anchor" aria-label="anchor" href="#age-distribution-analysis"></a>
