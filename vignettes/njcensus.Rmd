@@ -12,6 +12,39 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+# Create mock database for examples
+temp_db <- tempfile(fileext = ".duckdb")
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = temp_db)
+
+# Create sample data
+mock_data <- data.frame(
+  state = "34",
+  county = c("001", "003", "005"),
+  county_subdivision = c("00100", "00300", "00500"),
+  Total = c(1000, 2000, 3000),
+  municipality_name = c("Atlantic City", "Bergen Town", "Burlington City"),
+  county_name = c("Atlantic", "Bergen", "Burlington"),
+  year = 2020
+)
+
+# Create test tables for different demographics
+tables <- expand.grid(
+  demographic = c("white", "asian", "boaa", "aian"),
+  gender = c("male", "female"),
+  year = c(2010, 2020)
+)
+
+for(i in 1:nrow(tables)) {
+  table_name <- paste(tables$demographic[i], tables$gender[i], tables$year[i], sep = "_")
+  DBI::dbWriteTable(con, table_name, mock_data)
+}
+
+DBI::dbDisconnect(con, shutdown = TRUE)
+
+# Set environment variable for database path
+Sys.setenv(CENSUS_DB_PATH = temp_db)
+
 ```
 
 ```{r setup}
@@ -35,8 +68,9 @@ Before retrieving any data, you need to initialize the census database:
 
 There are two ways to initialize the census database:
 
-1. Using pre-packaged data (recommended):
-```r
+1.  Using pre-packaged data (recommended):
+
+``` r
 init_census_data()  # Uses included data
 ```
 
@@ -44,30 +78,36 @@ This function:
 
 Creates a DuckDB database file Downloads and processes both 2010 and 2020 census data Sets up the necessary tables for querying
 
-2. Fetching fresh data from Census API:
+2.  Fetching fresh data from Census API:
 
-```r
+``` r
 init_census_data(use_packaged_data = FALSE)
 ```
 
 The pre-packaged data approach is recommended because:
 
-* It's significantly faster
-* Doesn't depend on API availability
-* Works without internet connection
-* Avoids API rate limits
-* Census data for 2010 and 2020 is static
+-   It's significantly faster
+-   Doesn't depend on API availability
+-   Works without internet connection
+-   Avoids API rate limits
+-   Census data for 2010 and 2020 is static
 
 ## Basic Data Retrieval
 
 To retrieve data for a specific demographic group and year:
 
 ``` r
-# Get data for white males in 2020
-white_male_2020 <- get_census_data("white", "male", 2020)
+# Get preview of all demographics
+preview <- get_census_data()
+preview  # Shows formatted table
 
-# View the first few rows
-head(white_male_2020)
+# Use defaults (white males in 2020)
+default_data <- get_census_data("white")
+default_data  # Shows formatted table
+
+# Specific query
+asian_female_2010 <- get_census_data("asian", "female", 2010)
+asian_female_2010  # Shows formatted table
 ```
 
 ## Available Demographics
