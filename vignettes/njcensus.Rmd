@@ -60,12 +60,6 @@ The njcensus package provides tools for working with New Jersey Census demograph
 
 ### Initialize the Database
 
-Before retrieving any data, you need to initialize the census database:
-
-## Getting Started
-
-### Initialize the Database
-
 There are two ways to initialize the census database:
 
 1.  Using pre-packaged data (recommended):
@@ -124,26 +118,7 @@ The package supports these demographic groups:
 
 ## Example Analyses
 
-## Data Retrieval and Display
-
-The package provides smart defaults and formatted output:
-
-```{r}
-# Get preview of all demographics
-preview <- get_census_data()
-preview  # Shows formatted table
-
-# Use defaults (white males in 2020)
-default_data <- get_census_data("white")
-default_data  # Shows formatted table
-
-# Specific query
-asian_female_2010 <- get_census_data("asian", "female", 2010)
-asian_female_2010  # Shows formatted table
-
-```
-
-## Population Distribution by County
+### Population Distribution by County
 
 ``` r
 # Get Asian population data for 2020
