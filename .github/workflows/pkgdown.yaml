@@ -15,12 +15,12 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: write
-      pages: write
-      id-token: write
+      pages: write    # Enables deployment to GitHub Pages
+      id-token: write # Required for GitHub OIDC authentication
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4  # Updated to latest
 
       - name: Setup pandoc
         uses: r-lib/actions/setup-pandoc@v2
