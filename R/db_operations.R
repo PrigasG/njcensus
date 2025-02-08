@@ -217,6 +217,7 @@ set_db_path <- function(path) {
 #' @param x Census data frame from get_census_data
 #' @param ... Additional arguments passed to print
 #' @importFrom knitr kable
+#' @keywords internal
 #' @export
 print.census_data <- function(x, ...) {
   # Determine available columns
