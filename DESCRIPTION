@@ -20,7 +20,8 @@ Imports:
     sf,
     tigris,
     parallel,
-    futile.logger
+    futile.logger,
+    xfun
 Suggests: 
     knitr,
     rmarkdown,
