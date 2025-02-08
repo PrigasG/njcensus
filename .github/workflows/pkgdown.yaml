@@ -1,3 +1,5 @@
+name: pkgdown
+
 on:
   push:
     branches: [main, master]
@@ -6,8 +8,6 @@ on:
     types: [published]
   workflow_dispatch:
 
-name: pkgdown
-
 jobs:
   pkgdown:
     runs-on: ubuntu-latest
@@ -15,8 +15,12 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: write
+      pages: write
+      id-token: write
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Setup pandoc
         uses: r-lib/actions/setup-pandoc@v2
@@ -41,11 +45,9 @@ jobs:
         shell: Rscript {0}
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: 'docs'
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
