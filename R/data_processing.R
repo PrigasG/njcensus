@@ -143,9 +143,11 @@ process_census_data <- function(year) {
 
       # Add debug messages around table writing
       table_name <- paste0(name, "_", year)
+      message("\n", paste(rep("=", 80), collapse = ""))
       message(sprintf("Attempting to write table %s to database at %s", table_name, db_path))
       dbWriteTable(con, table_name, merged_df, overwrite = TRUE)
-      message(sprintf("Successfully wrote table: %s", table_name))
+      message(sprintf("✓ Successfully wrote table: %s", table_name))
+      message(paste(rep("=", 80), collapse = ""), "\n")
 
       cat("\n")
     }
@@ -175,9 +177,11 @@ process_census_data <- function(year) {
 
       # Add debug messages around table writing
       table_name <- paste0(name, "_", year)
+      message("\n", paste(rep("=", 80), collapse = ""))
       message(sprintf("Attempting to write table %s to database at %s", table_name, db_path))
       dbWriteTable(con, table_name, merged_df, overwrite = TRUE)
-      message(sprintf("Successfully wrote table: %s", table_name))
+      message(sprintf("✓ Successfully wrote table: %s", table_name))
+      message(paste(rep("=", 80), collapse = ""), "\n")
 
       cat("\n")
     }

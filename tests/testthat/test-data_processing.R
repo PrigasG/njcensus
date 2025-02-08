@@ -94,26 +94,19 @@ test_that("init_census_data configures database correctly", {
   withr::with_envvar(
     new = c("CENSUS_DB_PATH" = temp_db),
     code = {
-      init_census_data(force_refresh = TRUE)
+      # Using new API mode instead of force_refresh
+      init_census_data(use_packaged_data = FALSE)
 
       con <- dbConnect(duckdb::duckdb(), temp_db)
       on.exit(dbDisconnect(con, shutdown = TRUE))
 
       memory_limit <- dbGetQuery(con, "SELECT current_setting('memory_limit')")[[1]]
-      message("Raw memory limit: ", memory_limit)
-
       # Convert to numeric GB for comparison
       memory_gb <- as.numeric(gsub("[^0-9.]", "", memory_limit))
       if(grepl("GiB", memory_limit)) {
         memory_gb <- memory_gb * 1.074 # Convert GiB to GB
       }
-
-      # Debug output
-      message("Converted memory (GB): ", memory_gb)
-
-      # Check if memory is at least 4GB
-      expect_true(memory_gb >= 4,
-                  info = sprintf("Memory limit %f GB is less than required 4GB", memory_gb))
+      expect_true(memory_gb >= 4, "Memory limit should be at least 4GB")
     }
   )
 

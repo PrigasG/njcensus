@@ -22,7 +22,7 @@ get_nj_geo_reference <- function(year) {
     return(get(cache_key, envir = .geo_cache))
   }
 
-  nj_counties <- tigris::counties(state = "NJ", cb = TRUE, year = year) %>%
+  nj_counties <- suppressMessages(tigris::counties(state = "NJ", cb = TRUE, year = year)) %>%
     sf::st_as_sf() %>%
     sf::st_transform(crs = 4326) %>%
     sf::st_drop_geometry() %>%
@@ -30,7 +30,7 @@ get_nj_geo_reference <- function(year) {
     dplyr::rename(county_name = NAME)
 
   # Get municipalities with conditional column selection
-  nj_municipalities <- tigris::county_subdivisions(state = "NJ", cb = TRUE, year = year) %>%
+  nj_municipalities <- suppressMessages(tigris::county_subdivisions(state = "NJ", cb = TRUE, year = year)) %>%
     sf::st_as_sf() %>%
     sf::st_transform(crs = 4326) %>%
     sf::st_drop_geometry() %>%

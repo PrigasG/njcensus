@@ -4,24 +4,42 @@
 \alias{get_census_data}
 \title{Read Census Data from DuckDB}
 \usage{
-get_census_data(demographic = NULL, gender = NULL, year = 2020)
+get_census_data(
+  demographic = NULL,
+  gender = "male",
+  year = 2020,
+  preview_limit = 10
+)
 }
 \arguments{
-\item{demographic}{Character. Demographic group (e.g., "white", "asian", "boaa")}
+\item{demographic}{Character. Demographic group (e.g., "white", "asian", "boaa").
+If NULL, returns preview of all groups.}
 
-\item{gender}{Character. Gender ("male" or "female")}
+\item{gender}{Character. Gender ("male" or "female"). Defaults to "male".}
 
-\item{year}{Numeric. Census year (2010 or 2020)}
+\item{year}{Numeric. Census year (2010 or 2020). Defaults to 2020.}
+
+\item{preview_limit}{Numeric. Number of rows to return when no demographic specified.
+Defaults to 10.}
 }
 \value{
-A data frame containing the requested census data
+A data frame of class 'census_data' containing the requested census data,
+with formatted printing capabilities.
 }
 \description{
-Retrieves census data for specified demographic group, gender, and year
+Retrieves census data for specified demographic group, gender, and year.
+If no specific parameters are provided, returns a preview of all demographics.
+Returns data in a formatted table view for easy reading.
 }
 \examples{
 \dontrun{
-white_male_2020 <- get_census_data("white", "male", 2020)
+# Get preview of all demographics
+preview <- get_census_data()
+
+# Get data with defaults (white males in 2020)
+default_data <- get_census_data("white")
+
+# Get specific data
 asian_female_2010 <- get_census_data("asian", "female", 2010)
 }
 }

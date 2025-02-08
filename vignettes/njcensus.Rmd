@@ -84,6 +84,25 @@ The package supports these demographic groups:
 
 ## Example Analyses
 
+## Data Retrieval and Display
+
+The package provides smart defaults and formatted output:
+
+```{r}
+# Get preview of all demographics
+preview <- get_census_data()
+preview  # Shows formatted table
+
+# Use defaults (white males in 2020)
+default_data <- get_census_data("white")
+default_data  # Shows formatted table
+
+# Specific query
+asian_female_2010 <- get_census_data("asian", "female", 2010)
+asian_female_2010  # Shows formatted table
+
+```
+
 ## Population Distribution by County
 
 ``` r

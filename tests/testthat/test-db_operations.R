@@ -99,6 +99,54 @@ withr::with_file(create_test_db(), {
     unlink(temp_db)
   })
 
+  test_that("get_census_data handles defaults correctly", {
+    skip_on_cran()
+    temp_db <- tempfile(fileext = ".duckdb")
+
+    withr::with_envvar(
+      new = c("CENSUS_DB_PATH" = temp_db),
+      code = {
+        # Set up test database
+        con <- dbConnect(duckdb::duckdb(), dbdir = temp_db)
+        on.exit(dbDisconnect(con, shutdown = TRUE))
+
+        # Create test data for multiple demographics
+        demographics <- c("white", "asian")
+        for(demo in demographics) {
+          test_data <- data.frame(
+            state = "34",
+            county = "001",
+            county_subdivision = "00100",
+            Total = 1000,
+            municipality_name = "Test City",
+            county_name = "Test County",
+            year = 2020
+          )
+          table_name <- paste(demo, "male", "2020", sep = "_")
+          dbWriteTable(con, table_name, test_data)
+        }
+
+        # Test preview mode (NULL demographic)
+        preview <- get_census_data()
+        expect_s3_class(preview, "data.frame")
+        expect_true("demographic" %in% names(preview))
+        expect_lte(nrow(preview), 10 * length(demographics))
+
+        # Test default gender and year
+        default_data <- get_census_data("white")
+        expect_s3_class(default_data, "data.frame")
+
+        # Test warning for invalid year
+        expect_warning(
+          get_census_data("white", year = 2015),
+          "Invalid year"
+        )
+      }
+    )
+
+    unlink(temp_db)
+  })
+
   test_that("init_census_data handles packaged data correctly", {
     skip_on_cran()
     temp_db <- tempfile(fileext = ".duckdb")

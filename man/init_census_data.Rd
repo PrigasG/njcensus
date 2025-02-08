@@ -5,28 +5,53 @@
 \title{Initialize Census Database}
 \usage{
 init_census_data(
-  force_refresh = FALSE,
+  use_packaged_data = TRUE,
   worker_threads = parallel::detectCores() - 1,
   memory_limit = "4GB"
 )
 }
 \arguments{
-\item{force_refresh}{Logical. If TRUE, recreates database even if it exists}
+\item{use_packaged_data}{Logical. If TRUE, uses pre-packaged data. If FALSE, fetches from Census API.}
 
-\item{worker_threads}{Integer. Number of threads for parallel processing}
+\item{worker_threads}{Integer. Number of threads for parallel processing when fetching from API.}
 
-\item{memory_limit}{Character. Memory limit for DuckDB (default: "4GB")}
+\item{memory_limit}{Character. Memory limit for DuckDB (default: "4GB").}
 }
 \value{
-None. Creates or updates the census database.
+None. Creates or initializes the census database.
 }
 \description{
-Creates or refreshes the census database with both 2010 and 2020 data
+Creates or initializes the census database with both 2010 and 2020 data.
+Either uses pre-packaged data (recommended) or fetches from Census API.
+}
+\details{
+The function provides two methods of initializing the census database:
+\enumerate{
+\item Using pre-packaged data (faster, reliable, no API limits)
+\item Fetching from Census API (for custom updates)
+}
+
+Pre-packaged data is recommended for most users as:
+\itemize{
+\item It's faster to initialize
+\item Doesn't depend on API availability
+\item Avoids API rate limits
+\item Census data for 2010 and 2020 is static
+}
 }
 \examples{
 \dontrun{
+# Use pre-packaged data (recommended)
 init_census_data()
-init_census_data(force_refresh = TRUE)
-init_census_data(force_refresh = TRUE, worker_threads = 4, memory_limit = "8GB")
+
+# Fetch fresh data from Census API
+init_census_data(use_packaged_data = FALSE)
+
+# Customize API fetch settings
+init_census_data(
+  use_packaged_data = FALSE,
+  worker_threads = 4,
+  memory_limit = "8GB"
+)
 }
 }
