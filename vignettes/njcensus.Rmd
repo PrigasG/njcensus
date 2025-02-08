@@ -7,11 +7,20 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+if (!requireNamespace("njcensus", quietly = TRUE)) {
+  remotes::install_local(dependencies = TRUE)
+}
+
+# Load necessary libraries
+library(DBI)
+library(duckdb)
 
 # Create mock database for examples
 temp_db <- tempfile(fileext = ".duckdb")
@@ -70,7 +79,9 @@ init_census_data()  # Uses included data
 
 This function:
 
-Creates a DuckDB database file Downloads and processes both 2010 and 2020 census data Sets up the necessary tables for querying
+- Creates a DuckDB database file 
+- Downloads and processes both 2010 and 2020 census data 
+- Sets up the necessary tables for querying
 
 2.  Fetching fresh data from Census API:
 
