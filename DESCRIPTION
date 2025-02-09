@@ -21,9 +21,9 @@ Imports:
     tigris,
     parallel,
     futile.logger,
-    xfun
+    xfun,
+    knitr
 Suggests: 
-    knitr,
     rmarkdown,
     testthat (>= 3.0.0),
     mockery,
