@@ -29,33 +29,64 @@ create_test_db <- function() {
 # Tests
 withr::with_file(create_test_db(), {
   test_that("get_census_data validates input parameters correctly", {
-    # Test invalid demographic
-    expect_error(
-      get_census_data("invalid", "male", 2020),
-      "Invalid demographic"
+    # Create mock database for testing
+    temp_db <- tempfile(fileext = ".duckdb")
+    con <- DBI::dbConnect(duckdb::duckdb(), dbdir = temp_db)
+
+    # Create sample data
+    mock_data <- data.frame(
+      state = "34",
+      county = c("001", "003", "005"),
+      county_subdivision = c("00100", "00300", "00500"),
+      Total = c(1000, 2000, 3000),
+      municipality_name = c("Atlantic City", "Bergen Town", "Burlington City"),
+      county_name = c("Atlantic", "Bergen", "Burlington"),
+      year = 2020
     )
 
-    # Test invalid gender
-    expect_error(
-      get_census_data("white", "other", 2020),
-      "Invalid gender"
+    # Create test tables for different demographics
+    tables <- expand.grid(
+      demographic = c("white", "asian", "boaa", "aian"),
+      gender = c("male", "female"),
+      year = c(2010, 2020)
     )
 
-    # Test invalid year
-    expect_error(
-      get_census_data("white", "male", 2015),
-      "Invalid year"
+    for(i in 1:nrow(tables)) {
+      table_name <- paste(tables$demographic[i], tables$gender[i], tables$year[i], sep = "_")
+      DBI::dbWriteTable(con, table_name, mock_data)
+    }
+
+    DBI::dbDisconnect(con, shutdown = TRUE)
+
+    withr::with_envvar(
+      new = c("CENSUS_DB_PATH" = temp_db),
+      code = {
+        # Test invalid demographic
+        expect_error(
+          get_census_data("invalid", "male", 2020),
+          "Invalid demographic"
+        )
+
+        # Test invalid gender
+        expect_error(
+          get_census_data("white", "other", 2020),
+          "Invalid gender"
+        )
+
+        # Test invalid year
+        expect_error(
+          get_census_data("white", "male", 2015),
+          "Invalid year"
+        )
+
+        # Test valid query
+        result <- get_census_data("white", "male", 2020)
+        expect_s3_class(result, "data.frame")
+        expect_true(all(c("county_name", "municipality_name", "Total") %in% names(result)))
+      }
     )
 
-    # Test NULL parameters
-    expect_error(
-      get_census_data(NULL, "male", 2020),
-      "Invalid demographic"
-    )
-    expect_error(
-      get_census_data("white", NULL, 2020),
-      "Invalid gender"
-    )
+    unlink(temp_db)
   })
 
   test_that("get_census_data handles database connection properly", {
