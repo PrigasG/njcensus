@@ -33,22 +33,18 @@ jobs:
             libcurl4-openssl-dev \
             libharfbuzz-dev \
             libfribidi-dev \
-            libudunits2-dev \
-            libgdal-dev \
-            libgeos-dev \
-            libproj-dev \
             pandoc
 
-      - name: Install R package dependencies
-        uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages: |
-            any::pkgdown
-            local::.
-          needs: website
+      - name: Install pkgdown and dependencies
+        run: |
+          install.packages(c("pkgdown", "rmarkdown", "knitr"))
+          install.packages(c("DBI", "httr", "jsonlite", "parallel", "futile.logger", "utils"))
+        shell: Rscript {0}
 
       - name: Build site
-        run: pkgdown::build_site()
+        run: |
+          devtools::load_all()
+          pkgdown::build_site()
         shell: Rscript {0}
 
       - name: Configure Pages
