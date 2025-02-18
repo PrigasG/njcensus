@@ -35,16 +35,14 @@ jobs:
             libfribidi-dev \
             pandoc
 
-      - name: Install pkgdown and dependencies
+      - name: Install R packages
         run: |
-          install.packages(c("pkgdown", "rmarkdown", "knitr"))
+          install.packages(c("pkgdown", "rmarkdown", "knitr", "devtools"))
           install.packages(c("DBI", "httr", "jsonlite", "parallel", "futile.logger", "utils"))
         shell: Rscript {0}
 
       - name: Build site
-        run: |
-          devtools::load_all()
-          pkgdown::build_site()
+        run: pkgdown::build_site()
         shell: Rscript {0}
 
       - name: Configure Pages
