@@ -26,7 +26,7 @@ jobs:
         with:
           r-version: '4.2'
 
-      - name: Install system dependencies (excluding duckdb)
+      - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -47,14 +47,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-r-
 
-      - name: Install pak and all R dependencies (including duckdb)
+      - name: Install dependencies for documentation only
         run: |
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/stable")
-          pak::local_install_dev_deps(upgrade = TRUE)
-        shell: Rscript {0}
-
-      - name: Install pkgdown
-        run: install.packages("pkgdown")
+          install.packages(c("pkgdown", "rmarkdown", "knitr"))
         shell: Rscript {0}
 
       - name: Build site
