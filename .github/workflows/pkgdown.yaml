@@ -39,19 +39,13 @@ jobs:
             libproj-dev \
             pandoc
 
-      - name: Cache R packages
-        uses: actions/cache@v3
+      - name: Install R package dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-r-${{ hashFiles('DESCRIPTION') }}
-          restore-keys: |
-            ${{ runner.os }}-r-
-
-      - name: Install dependencies for documentation only
-        run: |
-          install.packages("pak", repos = "https://r-lib.github.io/p/pak/stable")
-          install.packages(c("pkgdown", "rmarkdown", "knitr"))
-        shell: Rscript {0}
+          extra-packages: |
+            any::pkgdown
+            local::.
+          needs: website
 
       - name: Build site
         run: pkgdown::build_site()
