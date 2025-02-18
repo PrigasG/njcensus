@@ -23,8 +23,10 @@ jobs:
 
       - name: Install R
         uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.2'
 
-      - name: Install system dependencies
+      - name: Install system dependencies (excluding duckdb)
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -37,11 +39,18 @@ jobs:
             libproj-dev \
             pandoc
 
-      - name: Install pak and R dependencies
+      - name: Cache R packages
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-r-${{ hashFiles('DESCRIPTION') }}
+          restore-keys: |
+            ${{ runner.os }}-r-
+
+      - name: Install pak and all R dependencies (including duckdb)
         run: |
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/stable")
           pak::local_install_dev_deps(upgrade = TRUE)
-          pak::pkg_install("duckdb", dependencies = TRUE)
         shell: Rscript {0}
 
       - name: Install pkgdown
