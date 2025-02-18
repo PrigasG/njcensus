@@ -33,17 +33,26 @@ jobs:
             libcurl4-openssl-dev \
             libharfbuzz-dev \
             libfribidi-dev \
+            libfreetype6-dev \
+            libpng-dev \
+            libtiff5-dev \
+            libjpeg-dev \
+            libfontconfig1-dev \
+            libcairo2-dev \
             pandoc
+
+      - name: Install dependencies for systemfonts and textshaping
+        run: |
+          sudo apt-get install -y \
+            libsystemd-dev \
+            libfribidi-dev \
+            libharfbuzz-dev \
+            libfontconfig1-dev
 
       - name: Install R packages
         run: |
+          install.packages(c("systemfonts", "textshaping", "ragg"))
           install.packages(c("pkgdown", "rmarkdown", "knitr", "devtools", "DBI", "httr", "jsonlite", "futile.logger"))
-          packageVersion("pkgdown")  # Verify pkgdown installation
-        shell: Rscript {0}
-
-      - name: Set up R package
-        run: |
-          devtools::document()
         shell: Rscript {0}
 
       - name: Build site
