@@ -37,25 +37,15 @@ jobs:
             libproj-dev \
             pandoc
 
-      - name: Install pak
+      - name: Install pak and R dependencies
         run: |
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/stable")
+          pak::local_install_dev_deps(upgrade = TRUE)
+          pak::pkg_install("duckdb", dependencies = TRUE)
         shell: Rscript {0}
 
-      - name: Cache R packages
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ env.R_LIBS_USER }}
-            !${{ env.R_LIBS_USER }}/pak
-          key: ${{ runner.os }}-${{ steps.install-r.outputs.installed-r-version }}-1-${{ hashFiles('.github/r-depends.rds') }}
-          restore-keys: ${{ runner.os }}-${{ steps.install-r.outputs.installed-r-version }}-1-
-
-      - name: Install dependencies
-        run: |
-          pak::pkg_install("duckdb")
-          pak::local_install_deps(dependencies = TRUE)
-          pak::pkg_install("pkgdown")
+      - name: Install pkgdown
+        run: install.packages("pkgdown")
         shell: Rscript {0}
 
       - name: Build site
