@@ -21,13 +21,14 @@ Imports:
     tigris,
     parallel,
     futile.logger,
-    xfun,
-    knitr
+    knitr,
+    utils
 Suggests: 
     rmarkdown,
     testthat (>= 3.0.0),
     mockery,
-    withr
+    withr,
+    remotes
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://prigasg.github.io/njcensus
