@@ -1,7 +1,43 @@
 url: https://prigasg.github.io/njcensus/
 
-articles:
-  - title: All articles
-    contents:
-      - njcensus
-      - population-estimates
+template:
+  bootstrap: 5
+
+navbar:
+  structure:
+    left:  [intro, reference, articles, tutorials, news]
+    right: [github]
+  components:
+    articles:
+      text: Articles
+      menu:
+      - text: Getting Started
+        href: articles/njcensus.html
+      - text: Working with Population Estimates
+        href: articles/population-estimates.html
+
+reference:
+- title: "Census Data Functions"
+  desc: "Functions for working with decennial census data"
+  contents:
+  - init_census_data
+  - get_census_data
+  - process_census_data
+  - get_nj_geo_reference
+
+- title: "Population Estimates Functions"
+  desc: "Functions for working with population estimates data"
+  contents:
+  - process_pop_estimates
+  - get_pop_estimates
+
+- title: "Database Utilities"
+  desc: "Functions for managing the database"
+  contents:
+  - get_db_path
+  - set_db_path
+
+- title: "Helper Functions"
+  desc: "Utility functions"
+  contents:
+  - create_spinner

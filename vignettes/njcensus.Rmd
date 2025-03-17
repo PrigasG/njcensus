@@ -69,19 +69,27 @@ The njcensus package provides tools for working with New Jersey Census demograph
 
 ### Initialize the Database
 
-There are two ways to initialize the census database:
+To initialize the census database:
 
-1.  Using pre-packaged data (recommended):
+```r
+# Initialize with just census data
+init_census_data()
 
-``` r
-init_census_data()  # Uses included data
+# Initialize with census data and population estimates
+init_census_data(include_pop_estimates = TRUE)
 ```
 
 This function:
 
-- Creates a DuckDB database file 
-- Downloads and processes both 2010 and 2020 census data 
+- Creates a DuckDB database file
+- Downloads and processes both 2010 and 2020 census data
+- Optionally adds population estimates data (2021-2023)
 - Sets up the necessary tables for querying
+
+If the database already exists, it will intelligently:
+
+- Use the existing census data
+- Only add population estimates if requested and not already present
 
 2.  Fetching fresh data from Census API:
 
