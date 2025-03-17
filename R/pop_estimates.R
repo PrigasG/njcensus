@@ -182,7 +182,6 @@ get_pop_estimates <- function(file_type = "agesex",
 #' Print Population Estimates Data
 #' @param x Population estimates data frame
 #' @param ... Additional arguments passed to print
-#' @importFrom utils head
 #' @export
 print.pop_estimates <- function(x, ...) {
   cat("\nPopulation Estimates Data\n")
@@ -196,7 +195,7 @@ print.pop_estimates <- function(x, ...) {
   display_data <- x[, display_cols]
 
   if(nrow(display_data) > 0) {
-    print.data.frame(head(display_data, 10), row.names = FALSE)
+    print.data.frame(utils::head(display_data, 10), row.names = FALSE)
 
     if(nrow(x) > 10) {
       cat(sprintf("\n... showing 10 rows of %s total rows\n",

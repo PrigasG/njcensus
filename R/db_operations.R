@@ -284,7 +284,6 @@ set_db_path <- function(path) {
 #' @param x Census data frame from get_census_data
 #' @param ... Additional arguments passed to print
 #' @importFrom knitr kable
-#' @importFrom utils head
 #' @keywords internal
 #' @export
 print.census_data <- function(x, ...) {
@@ -316,7 +315,7 @@ print.census_data <- function(x, ...) {
   if(nrow(display_data) > 0) {
     # Add thousands separator for Total
     display_data$Total <- format(display_data$Total, big.mark = ",")
-    print.data.frame(head(display_data, 10), row.names = FALSE)
+    print.data.frame(utils::head(display_data, 10), row.names = FALSE)
 
     # Show column info
     age_cols <- grep("_years$", names(x), value = TRUE)
