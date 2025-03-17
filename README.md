@@ -1,25 +1,22 @@
 # njcensus
 
 <!-- badges: start -->
-
-[![R-CMD-check](https://github.com/yourusername/njcensus/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/yourusername/njcensus/actions/workflows/R-CMD-check.yaml) [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental) [![R-CMD-check](https://github.com/PrigasG/njcensus/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/PrigasG/njcensus/actions/workflows/R-CMD-check.yaml) [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-
+[![R-CMD-check](https://github.com/PrigasG/njcensus/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/PrigasG/njcensus/actions/workflows/R-CMD-check.yaml) 
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
 ## Overview
-
-`njcensus` is an R package for downloading, processing, and analyzing New Jersey census demographic data. It supports both 2010 and 2020 census years and provides tools for working with demographic indicators across counties and municipalities.
+`njcensus` is an R package for downloading, processing, and analyzing New Jersey census demographic data. It supports both 2010 and 2020 census years and provides tools for working with demographic indicators across counties and municipalities. It also includes population estimates data from 2021-2023.
 
 ## Features
-
 -   Downloads demographic data from the Census Bureau API
 -   Processes population data by race and gender
 -   Stores results in a DuckDB database for efficient querying
 -   Supports both 2010 and 2020 census years
+-   Includes population estimates for 2021-2023
 -   Handles county and municipality level data
 
 ## Installation
-
 You can install the development version of njcensus from GitHub with:
 
 ``` r
@@ -40,12 +37,41 @@ init_census_data()
 # Or fetch fresh data from Census API (optional)
 init_census_data(use_packaged_data = FALSE)
 
-# Get data for white males in 2020
-white_male_data <- get_census_data("white", "male", 2020)
-
-# Get data for Asian females in 2010
-asian_female_data <- get_census_data("asian", "female", 2010)
+# Initialize without population estimates
+init_census_data(include_pop_estimates = FALSE)
 ```
+
+## Accessing Census Data
+```r
+# Get preview of all demographics
+preview <- get_census_data()
+
+# Get data for white males in 2020 (default)
+default_data <- get_census_data("white")
+
+# Get specific data
+asian_female_2010 <- get_census_data("asian", "female", 2010)
+
+# Filter by county
+atlantic_data <- get_census_data("white", counties = "Atlantic")
+
+# Filter by municipality
+jersey_city_data <- get_census_data("white", municipalities = "Jersey City")
+```
+
+
+## Population Estimates
+```r
+# Get population estimates data (agesex is default)
+pop_data <- get_pop_estimates()
+
+# Get specific file type
+alldata <- get_pop_estimates(file_type = "alldata")
+
+# Filter by county and year
+atlantic_2023 <- get_pop_estimates(counties = "Atlantic", years = 2023)
+```
+
 
 ## Perfomance Note
 The package includes pre-packaged Census data for better performance and reliability:
@@ -90,12 +116,13 @@ data <- get_census_data(
 head(data)
 ```
 
+
 ## Database Structure
 
-Data is stored in a DuckDB database with tables named according to the pattern: `{demographic}_{gender}_{year}` Example table names:
+Data is stored in a DuckDB database with tables named according to the pattern:
 
--   white_male_2020
--   asian_female_2010
+-  Census data: {demographic}_{gender}_{year} (e.g., white_male_2020)
+- Population estimates: pop_estimates_{file_type} (e.g., pop_estimates_agesex)
 
 ## Contributing
 

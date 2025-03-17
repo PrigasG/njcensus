@@ -1,0 +1,159 @@
+---
+title: "Working with Population Estimates"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Working with Population Estimates}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(njcensus)
+library(dplyr)
+```
+
+## Introduction to Population Estimates
+
+In addition to decennial census data, the njcensus package now provides access to the Census Bureau's Population Estimates Program data for New Jersey counties. This vignette demonstrates how to access and analyze this data. Accessing Population Estimates Population estimates data can be accessed using the get_pop_estimates() function. By default, this returns age-sex data for all available years and counties.
+
+```{r}
+# Get all age-sex estimates
+pop_data <- get_pop_estimates()
+
+# View the first few rows
+head(pop_data)
+```
+
+## Available File Types
+
+The package supports three types of population estimate files:
+
+-   **agesex**: Age and sex data (default)
+-   **alldata**: All demographic data including race and ethnicity
+-   **syasex**: Single-year age and sex data
+
+You can specify which type you want:
+
+```{r}
+# Get all demographic data
+demo_data <- get_pop_estimates(file_type = "alldata")
+
+# Get single-year age and sex data
+single_year <- get_pop_estimates(file_type = "syasex")
+```
+
+## Filtering Data
+
+The function offers several filtering options: 
+### By County
+
+```{r}
+# Get estimates for Atlantic County
+atlantic <- get_pop_estimates(counties = "Atlantic")
+
+# Get estimates for multiple counties
+south_jersey <- get_pop_estimates(
+  counties = c("Atlantic", "Cape May", "Cumberland")
+)
+```
+
+### By Year
+
+```{r}
+# Get only 2023 estimates
+latest <- get_pop_estimates(years = 2023)
+
+# Get estimates for a range of years
+recent <- get_pop_estimates(years = c(2022, 2023))
+```
+
+## Example Analyses 
+
+## Population Change Over Time
+
+```{r}
+# Get all agesex data
+pop_data <- get_pop_estimates()
+
+# Calculate county totals by year
+county_trends <- pop_data %>%
+  filter(AGEGRP == 0) %>%  # Total population (all ages)
+  group_by(CTYNAME, YEAR) %>%
+  summarize(
+    Total = sum(TOT_POP),
+    .groups = "drop"
+  ) %>%
+  arrange(CTYNAME, YEAR)
+
+# View the trends
+head(county_trends)
+```
+
+## Age Distribution
+
+```{r}
+# Get recent population estimates
+pop_2023 <- get_pop_estimates(years = 2023)
+
+# Analyze age distribution
+age_distribution <- pop_2023 %>%
+  filter(AGEGRP > 0) %>%  # Exclude total population row
+  group_by(AGEGRP) %>%
+  summarize(
+    Population = sum(TOT_POP),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    Percentage = (Population / sum(Population)) * 100
+  )
+
+# View the age distribution
+head(age_distribution)
+```
+
+## Comparing Census Data with Estimates 
+
+You can also compare decennial census data with more recent population estimates:
+
+```{r}
+# Get 2020 census data
+census_2020 <- get_census_data("white", "male", 2020) %>%
+  group_by(county_name) %>%
+  summarize(Census_2020_Total = sum(Total))
+
+# Get 2023 estimates
+estimates_2023 <- get_pop_estimates(years = 2023) %>%
+  filter(AGEGRP == 0) %>%  # Total population
+  group_by(CTYNAME) %>%
+  summarize(Estimate_2023_Total = sum(TOT_POP))
+
+# Rename column for joining
+estimates_2023 <- estimates_2023 %>%
+  rename(county_name = CTYNAME)
+
+# Join and calculate change
+comparison <- census_2020 %>%
+  left_join(estimates_2023, by = "county_name") %>%
+  mutate(
+    Change = Estimate_2023_Total - Census_2020_Total,
+    Percent_Change = (Change / Census_2020_Total) * 100
+  )
+
+# View comparison
+head(comparison)
+```
+
+## Conclusion 
+Population estimates provide valuable data for the years between decennial censuses. The njcensus package makes it easy to access
+and analyze this data alongside the more comprehensive decennial census
+data.
