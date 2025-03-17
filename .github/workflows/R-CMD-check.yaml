@@ -37,7 +37,6 @@ jobs:
         with:
           extra-packages: any::rcmdcheck, any::knitr, any::rmarkdown
           needs: check
-          install-vignettes: true  # Ensures knitr/rmarkdown are available
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
