@@ -27,7 +27,7 @@ library(dplyr)
 
 In addition to decennial census data, the njcensus package now provides access to the Census Bureau's Population Estimates Program data for New Jersey counties. This vignette demonstrates how to access and analyze this data. Accessing Population Estimates Population estimates data can be accessed using the get_pop_estimates() function. By default, this returns age-sex data for all available years and counties.
 
-```{r, eval=FALSE}}
+```{r}
 # Get all age-sex estimates
 pop_data <- get_pop_estimates()
 
