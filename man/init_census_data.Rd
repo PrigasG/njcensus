@@ -5,21 +5,18 @@
 \title{Initialize Census Database}
 \usage{
 init_census_data(
-  use_packaged_data = TRUE,
   worker_threads = parallel::detectCores() - 1,
   memory_limit = "4GB",
-  include_pop_estimates = TRUE,
+  include_pop_estimates = FALSE,
   pop_estimate_years = c(2021, 2022, 2023)
 )
 }
 \arguments{
-\item{use_packaged_data}{Logical. If TRUE, uses pre-packaged data. If FALSE, fetches from Census API.}
-
 \item{worker_threads}{Integer. Number of threads for parallel processing when fetching from API.}
 
 \item{memory_limit}{Character. Memory limit for DuckDB (default: "4GB").}
 
-\item{include_pop_estimates}{Logical. Whether to include population estimates data. Default is TRUE.}
+\item{include_pop_estimates}{Logical. Whether to include population estimates data. Default is FALSE.}
 
 \item{pop_estimate_years}{Numeric vector. Years to include for population estimates. Default is c(2021, 2022, 2023).}
 }
@@ -27,40 +24,29 @@ init_census_data(
 None. Creates or initializes the census database.
 }
 \description{
-Creates or initializes the census database with both 2010 and 2020 data.
-Either uses pre-packaged data (recommended) or fetches from Census API.
+Creates or initializes the census database with both 2010 and 2020 census data.
+Data is fetched from the Census API.
 }
 \details{
-The function provides two methods of initializing the census database:
-\enumerate{
-\item Using pre-packaged data (faster, reliable, no API limits)
-\item Fetching from Census API (for custom updates)
-}
-
-Pre-packaged data is recommended for most users as:
+The function fetches data from the Census API and processes it into a DuckDB database.
 \itemize{
-\item It's faster to initialize
-\item Doesn't depend on API availability
-\item Avoids API rate limits
-\item Census data for 2010 and 2020 is static
+\item Census data for 2010 and 2020 is always fetched
+\item Population estimates can be optionally included
+\item If the database already exists, it will check for existing tables and only add missing ones
 }
 }
 \examples{
 \dontrun{
-# Use pre-packaged data (recommended)
+# Initialize with just census data
 init_census_data()
 
-# Fetch fresh data from Census API
-init_census_data(use_packaged_data = FALSE)
+# Initialize with census data and population estimates
+init_census_data(include_pop_estimates = TRUE)
 
 # Customize API fetch settings
 init_census_data(
-  use_packaged_data = FALSE,
   worker_threads = 4,
   memory_limit = "8GB"
 )
-
-# Initialize without population estimates
-init_census_data(include_pop_estimates = FALSE)
 }
 }

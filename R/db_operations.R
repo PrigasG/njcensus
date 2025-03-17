@@ -173,6 +173,7 @@ get_census_data <- function(demographic = NULL,
 #' The function fetches data from the Census API and processes it into a DuckDB database.
 #' - Census data for 2010 and 2020 is always fetched
 #' - Population estimates can be optionally included
+#' - If the database already exists, it will check for existing tables and only add missing ones
 #'
 #' @return None. Creates or initializes the census database.
 #' @export
