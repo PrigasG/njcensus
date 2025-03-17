@@ -33,7 +33,7 @@
 #' atlantic_data <- get_census_data("white", counties = "Atlantic")
 #'
 #' # Filter by municipality
-#' get_census_data("white", municipalities = c("Atlantic City", "Jersey City"))
+#' jersey_city_data <- get_census_data("white", municipalities = "Jersey City")
 #' }
 get_census_data <- function(demographic = NULL,
                             gender = "male",
