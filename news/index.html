@@ -66,12 +66,18 @@
 <h3 id="major-changes-0-2-0">Major changes<a class="anchor" aria-label="anchor" href="#major-changes-0-2-0"></a></h3>
 <ul><li>Added pre-packaged census data support to improve reliability and speed</li>
 <li>Modified <code><a href="../reference/init_census_data.html">init_census_data()</a></code> to use packaged data by default</li>
+<li>Added population estimates data functionality (2021-2023)</li>
+<li>Added filtering capabilities for counties and municipalities</li>
 </ul></div>
 <div class="section level3">
 <h3 id="features-0-2-0">Features<a class="anchor" aria-label="anchor" href="#features-0-2-0"></a></h3>
 <ul><li>New parameter <code>use_packaged_data</code> in <code><a href="../reference/init_census_data.html">init_census_data()</a></code>
 </li>
-<li>Improved database initialization stability</li>
+<li>New parameter <code>include_pop_estimates</code> to optionally include population estimates</li>
+<li>Added <code><a href="../reference/get_pop_estimates.html">get_pop_estimates()</a></code> function for accessing population estimates data</li>
+<li>Added county and municipality filtering in <code><a href="../reference/get_census_data.html">get_census_data()</a></code>
+</li>
+<li>Improved database initialization with smart detection of existing data</li>
 <li>Reduced dependency on Census API</li>
 </ul></div>
 <div class="section level3">
@@ -79,6 +85,9 @@
 <ul><li>Added proper system dependencies</li>
 <li>Improved error handling in database operations</li>
 <li>Enhanced test coverage</li>
+<li>Made console messages more professional</li>
+<li>Fixed syasex file availability issue (only available for 2023+)</li>
+<li>Improved namespace management with zzz.R approach</li>
 </ul></div>
 </div>
     <div class="section level2">
