@@ -3,4 +3,5 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   njcensus: njcensus.html
-last_built: 2025-03-17T00:43Z
+  population-estimates: population-estimates.html
+last_built: 2025-03-17T01:53Z

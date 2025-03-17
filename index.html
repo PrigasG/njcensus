@@ -45,6 +45,18 @@
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Articles
+
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="articles/population-estimates.html">Working with Population Estimates</a>
+    </li>
+  </ul>
+</li>
 <li>
   <a href="news/index.html">Changelog</a>
 </li>
@@ -73,11 +85,10 @@
 </h1></div>
 <!-- badges: start -->
 
-<!-- badges: end -->
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p><code>njcensus</code> is an R package for downloading, processing, and analyzing New Jersey census demographic data. It supports both 2010 and 2020 census years and provides tools for working with demographic indicators across counties and municipalities.</p>
+<p><code>njcensus</code> is an R package for downloading, processing, and analyzing New Jersey census demographic data. It supports both 2010 and 2020 census years and provides tools for working with demographic indicators across counties and municipalities. It also includes population estimates data from 2021-2023.</p>
 </div>
 <div class="section level2">
 <h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
@@ -87,6 +98,7 @@
 <li>Processes population data by race and gender</li>
 <li>Stores results in a DuckDB database for efficient querying</li>
 <li>Supports both 2010 and 2020 census years</li>
+<li>Includes population estimates for 2021-2023</li>
 <li>Handles county and municipality level data</li>
 </ul>
 </div>
@@ -113,12 +125,41 @@
 <span><span class="co"># Or fetch fresh data from Census API (optional)</span></span>
 <span><span class="fu"><a href="reference/init_census_data.html">init_census_data</a></span><span class="op">(</span>use_packaged_data <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Get data for white males in 2020</span></span>
-<span><span class="va">white_male_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_census_data.html">get_census_data</a></span><span class="op">(</span><span class="st">"white"</span>, <span class="st">"male"</span>, <span class="fl">2020</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Get data for Asian females in 2010</span></span>
-<span><span class="va">asian_female_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_census_data.html">get_census_data</a></span><span class="op">(</span><span class="st">"asian"</span>, <span class="st">"female"</span>, <span class="fl">2010</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Initialize without population estimates</span></span>
+<span><span class="fu"><a href="reference/init_census_data.html">init_census_data</a></span><span class="op">(</span>include_pop_estimates <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 </div>
+</div>
+<div class="section level2">
+<h2 id="accessing-census-data">Accessing Census Data<a class="anchor" aria-label="anchor" href="#accessing-census-data"></a>
+</h2>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get preview of all demographics</span></span>
+<span><span class="va">preview</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_census_data.html">get_census_data</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get data for white males in 2020 (default)</span></span>
+<span><span class="va">default_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_census_data.html">get_census_data</a></span><span class="op">(</span><span class="st">"white"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get specific data</span></span>
+<span><span class="va">asian_female_2010</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_census_data.html">get_census_data</a></span><span class="op">(</span><span class="st">"asian"</span>, <span class="st">"female"</span>, <span class="fl">2010</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Filter by county</span></span>
+<span><span class="va">atlantic_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_census_data.html">get_census_data</a></span><span class="op">(</span><span class="st">"white"</span>, counties <span class="op">=</span> <span class="st">"Atlantic"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Filter by municipality</span></span>
+<span><span class="va">jersey_city_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_census_data.html">get_census_data</a></span><span class="op">(</span><span class="st">"white"</span>, municipalities <span class="op">=</span> <span class="st">"Jersey City"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="population-estimates">Population Estimates<a class="anchor" aria-label="anchor" href="#population-estimates"></a>
+</h2>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get population estimates data (agesex is default)</span></span>
+<span><span class="va">pop_data</span> <span class="op">&lt;-</span> <span class="fu">get_pop_estimates</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get specific file type</span></span>
+<span><span class="va">alldata</span> <span class="op">&lt;-</span> <span class="fu">get_pop_estimates</span><span class="op">(</span>file_type <span class="op">=</span> <span class="st">"alldata"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Filter by county and year</span></span>
+<span><span class="va">atlantic_2023</span> <span class="op">&lt;-</span> <span class="fu">get_pop_estimates</span><span class="op">(</span>counties <span class="op">=</span> <span class="st">"Atlantic"</span>, years <span class="op">=</span> <span class="fl">2023</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="perfomance-note">Perfomance Note<a class="anchor" aria-label="anchor" href="#perfomance-note"></a>
@@ -149,11 +190,11 @@
 <h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
 </h2>
 <p>Process census data for a specific year:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Process 2020 census data</span></span>
 <span><span class="fu"><a href="reference/process_census_data.html">process_census_data</a></span><span class="op">(</span><span class="fl">2020</span><span class="op">)</span></span></code></pre></div>
 <p>Querying demographic data</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get data for specific demographics</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_census_data.html">get_census_data</a></span><span class="op">(</span></span>
 <span>  demographic <span class="op">=</span> <span class="st">"asian"</span>,</span>
@@ -167,10 +208,10 @@
 <div class="section level2">
 <h2 id="database-structure">Database Structure<a class="anchor" aria-label="anchor" href="#database-structure"></a>
 </h2>
-<p>Data is stored in a DuckDB database with tables named according to the pattern: <code>{demographic}_{gender}_{year}</code> Example table names:</p>
+<p>Data is stored in a DuckDB database with tables named according to the pattern:</p>
 <ul>
-<li>white_male_2020</li>
-<li>asian_female_2010</li>
+<li>Census data: {demographic}<em>{gender}</em>{year} (e.g., white_male_2020)</li>
+<li>Population estimates: pop_estimates_{file_type} (e.g., pop_estimates_agesex)</li>
 </ul>
 </div>
 <div class="section level2">
@@ -242,8 +283,6 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/yourusername/njcensus/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/yourusername/njcensus/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
 <li><a href="https://github.com/PrigasG/njcensus/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/PrigasG/njcensus/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
 </ul>
