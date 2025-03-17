@@ -22,7 +22,9 @@ Imports:
     parallel,
     futile.logger,
     knitr,
-    utils
+    utils,
+    readr,
+    purrr
 Suggests: 
     rmarkdown,
     testthat (>= 3.0.0),

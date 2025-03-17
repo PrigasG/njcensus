@@ -10,6 +10,11 @@
 #' @param year Numeric. Census year (2010 or 2020). Defaults to 2020.
 #' @param preview_limit Numeric. Number of rows to return when no demographic specified.
 #'        Defaults to 10.
+#' @param counties Character vector. County names to filter for. If NULL (default),
+#'        returns data for all counties.
+#' @param municipalities Character vector. Municipality names to filter for. If NULL (default),
+#'        returns data for all municipalities.
+#'
 #' @return A data frame of class 'census_data' containing the requested census data,
 #'         with formatted printing capabilities.
 #' @export
@@ -23,11 +28,19 @@
 #'
 #' # Get specific data
 #' asian_female_2010 <- get_census_data("asian", "female", 2010)
+#'
+#' # Filter by county
+#' atlantic_data <- get_census_data("white", counties = "Atlantic")
+#'
+#' # Filter by municipality
+#' get_census_data("white", municipalities = c("Atlantic City", "Jersey City"))
 #' }
 get_census_data <- function(demographic = NULL,
                             gender = "male",
                             year = 2020,
-                            preview_limit = 10) {
+                            preview_limit = 10,
+                            counties = NULL,
+                            municipalities = NULL) {
   # Define valid options
   valid_demographics <- c("white", "boaa", "aian", "asian", "nhpi", "others", "two_more")
   valid_genders <- c("male", "female")
@@ -41,12 +54,13 @@ get_census_data <- function(demographic = NULL,
   }
 
   # Check database existence
-  if(!file.exists("census_data.duckdb")) {
+  db_path <- Sys.getenv("CENSUS_DB_PATH", "census_data.duckdb")
+  if(!file.exists(db_path)) {
     stop("Census database not found. Please run init_census_data() first.")
   }
 
   # Connect to database
-  con <- dbConnect(duckdb::duckdb(), dbdir = "census_data.duckdb", read_only = FALSE)
+  con <- dbConnect(duckdb::duckdb(), dbdir = db_path, read_only = TRUE)
   on.exit(dbDisconnect(con, shutdown = TRUE))
 
   # Handle NULL demographic (preview mode)
@@ -54,13 +68,32 @@ get_census_data <- function(demographic = NULL,
     tables <- dbListTables(con)
     pattern <- paste0("_", gender, "_", year, "$")
     relevant_tables <- grep(pattern, tables, value = TRUE)
-
     result <- data.frame()
+
     for(table in relevant_tables) {
-      # Get all columns, not just the summary
+      # Build query with filters
       query <- sprintf("SELECT *, '%s' as demographic FROM \"%s\"",
                        sub(paste0("_", gender, "_", year), "", table),
                        table)
+
+      # Add WHERE clause if filters are provided
+      where_clauses <- c()
+
+      if(!is.null(counties)) {
+        counties_str <- paste0("'", counties, "'", collapse = ", ")
+        where_clauses <- c(where_clauses, sprintf("county_name IN (%s)", counties_str))
+      }
+
+      if(!is.null(municipalities)) {
+        munis_str <- paste0("'", municipalities, "'", collapse = ", ")
+        where_clauses <- c(where_clauses, sprintf("municipality_name IN (%s)", munis_str))
+      }
+
+      if(length(where_clauses) > 0) {
+        query <- paste0(query, " WHERE ", paste(where_clauses, collapse = " AND "))
+      }
+
+      # Execute query
       data <- dbGetQuery(con, query)
       result <- if(nrow(result) == 0) data else rbind(result, data)
     }
@@ -71,11 +104,10 @@ get_census_data <- function(demographic = NULL,
 
     # Format for display
     result <- result %>%
-      arrange(county_name, municipality_name) %>%
-      select(demographic, county_name, municipality_name,
-             matches("_years$"), Total, everything()) %>%
-      head(preview_limit)
-
+      dplyr::arrange(county_name, municipality_name) %>%
+      dplyr::select(demographic, county_name, municipality_name,
+                    dplyr::matches("_years$"), Total, dplyr::everything()) %>%
+      utils::head(preview_limit)
   } else {
     # Validate demographic if provided
     if(!demographic %in% valid_demographics) {
@@ -89,7 +121,28 @@ get_census_data <- function(demographic = NULL,
       stop(sprintf("Invalid combination of demographic/gender/year: %s", table_name))
     }
 
-    result <- dbGetQuery(con, sprintf("SELECT * FROM \"%s\"", table_name))
+    # Build query
+    query <- sprintf("SELECT * FROM \"%s\"", table_name)
+
+    # Add WHERE clause if filters are provided
+    where_clauses <- c()
+
+    if(!is.null(counties)) {
+      counties_str <- paste0("'", counties, "'", collapse = ", ")
+      where_clauses <- c(where_clauses, sprintf("county_name IN (%s)", counties_str))
+    }
+
+    if(!is.null(municipalities)) {
+      munis_str <- paste0("'", municipalities, "'", collapse = ", ")
+      where_clauses <- c(where_clauses, sprintf("municipality_name IN (%s)", munis_str))
+    }
+
+    if(length(where_clauses) > 0) {
+      query <- paste0(query, " WHERE ", paste(where_clauses, collapse = " AND "))
+    }
+
+    # Execute query
+    result <- dbGetQuery(con, query)
 
     # Remove rows with NA in county_name or municipality_name
     result <- subset(result,
@@ -97,9 +150,9 @@ get_census_data <- function(demographic = NULL,
 
     # Format for display
     result <- result %>%
-      arrange(county_name, municipality_name) %>%
-      select(county_name, municipality_name,
-             matches("_years$"), Total, everything())
+      dplyr::arrange(county_name, municipality_name) %>%
+      dplyr::select(county_name, municipality_name,
+                    dplyr::matches("_years$"), Total, dplyr::everything())
   }
 
   class(result) <- unique(c("census_data", class(result)))
@@ -114,6 +167,8 @@ get_census_data <- function(demographic = NULL,
 #' @param use_packaged_data Logical. If TRUE, uses pre-packaged data. If FALSE, fetches from Census API.
 #' @param worker_threads Integer. Number of threads for parallel processing when fetching from API.
 #' @param memory_limit Character. Memory limit for DuckDB (default: "4GB").
+#' @param include_pop_estimates Logical. Whether to include population estimates data. Default is TRUE.
+#' @param pop_estimate_years Numeric vector. Years to include for population estimates. Default is c(2021, 2022, 2023).
 #'
 #' @details
 #' The function provides two methods of initializing the census database:
@@ -143,15 +198,19 @@ get_census_data <- function(demographic = NULL,
 #'   worker_threads = 4,
 #'   memory_limit = "8GB"
 #' )
+#'
+#' # Initialize without population estimates
+#' init_census_data(include_pop_estimates = FALSE)
 #' }
 init_census_data <- function(use_packaged_data = TRUE,
                              worker_threads = parallel::detectCores() - 1,
-                             memory_limit = "4GB") {
+                             memory_limit = "4GB",
+                             include_pop_estimates = TRUE,
+                             pop_estimate_years = c(2021, 2022, 2023)) {
   if(use_packaged_data) {
     # Use included database
     source_db_path <- system.file("extdata", "census_data.duckdb", package = "njcensus")
     target_db_path <- Sys.getenv("CENSUS_DB_PATH", "census_data.duckdb")
-
     if(!file.exists(target_db_path)) {
       message("Copying packaged census database...")
       file.copy(source_db_path, target_db_path)
@@ -159,26 +218,34 @@ init_census_data <- function(use_packaged_data = TRUE,
     } else {
       message("Using existing census database at ", target_db_path)
     }
+
+    # Add population estimates if requested
+    if(include_pop_estimates) {
+      message("Processing population estimates data...")
+      process_pop_estimates(years = pop_estimate_years, save_to_db = TRUE)
+    }
   } else {
     # Use API to fetch data
     db_path <- Sys.getenv("CENSUS_DB_PATH", "census_data.duckdb")
     message("Fetching census data for 2010 and 2020... This may take a few minutes.")
-
     tryCatch({
       con <- dbConnect(duckdb::duckdb(), dbdir = db_path)
       on.exit(dbDisconnect(con, shutdown = TRUE))
-
       # Configure database
       dbExecute(con, sprintf("SET memory_limit='%s'", memory_limit))
       dbExecute(con, sprintf("SET threads=%d", worker_threads))
-
       # Verify settings
       actual_memory <- dbGetQuery(con, "SELECT current_setting('memory_limit')")[[1]]
       message("Configured memory limit: ", actual_memory)
-
       # Process data
       process_census_data(2010)
       process_census_data(2020)
+
+      # Add population estimates if requested
+      if(include_pop_estimates) {
+        message("Processing population estimates data...")
+        process_pop_estimates(years = pop_estimate_years, save_to_db = TRUE)
+      }
 
       message("Census database ready to use at ", db_path)
     }, error = function(e) {
