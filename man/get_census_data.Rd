@@ -8,7 +8,9 @@ get_census_data(
   demographic = NULL,
   gender = "male",
   year = 2020,
-  preview_limit = 10
+  preview_limit = 10,
+  counties = NULL,
+  municipalities = NULL
 )
 }
 \arguments{
@@ -21,6 +23,12 @@ If NULL, returns preview of all groups.}
 
 \item{preview_limit}{Numeric. Number of rows to return when no demographic specified.
 Defaults to 10.}
+
+\item{counties}{Character vector. County names to filter for. If NULL (default),
+returns data for all counties.}
+
+\item{municipalities}{Character vector. Municipality names to filter for. If NULL (default),
+returns data for all municipalities.}
 }
 \value{
 A data frame of class 'census_data' containing the requested census data,
@@ -41,5 +49,11 @@ default_data <- get_census_data("white")
 
 # Get specific data
 asian_female_2010 <- get_census_data("asian", "female", 2010)
+
+# Filter by county
+atlantic_data <- get_census_data("white", counties = "Atlantic")
+
+# Filter by municipality
+jersey_city_data <- get_census_data("white", municipalities = "Jersey City")
 }
 }

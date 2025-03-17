@@ -7,7 +7,9 @@
 init_census_data(
   use_packaged_data = TRUE,
   worker_threads = parallel::detectCores() - 1,
-  memory_limit = "4GB"
+  memory_limit = "4GB",
+  include_pop_estimates = TRUE,
+  pop_estimate_years = c(2021, 2022, 2023)
 )
 }
 \arguments{
@@ -16,6 +18,10 @@ init_census_data(
 \item{worker_threads}{Integer. Number of threads for parallel processing when fetching from API.}
 
 \item{memory_limit}{Character. Memory limit for DuckDB (default: "4GB").}
+
+\item{include_pop_estimates}{Logical. Whether to include population estimates data. Default is TRUE.}
+
+\item{pop_estimate_years}{Numeric vector. Years to include for population estimates. Default is c(2021, 2022, 2023).}
 }
 \value{
 None. Creates or initializes the census database.
@@ -53,5 +59,8 @@ init_census_data(
   worker_threads = 4,
   memory_limit = "8GB"
 )
+
+# Initialize without population estimates
+init_census_data(include_pop_estimates = FALSE)
 }
 }

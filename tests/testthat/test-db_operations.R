@@ -5,7 +5,7 @@ library(jsonlite)
 library(dplyr)
 library(mockery)
 
-# Keep your existing helper function
+# Keep your existing create_test_db helper function
 create_test_db <- function() {
   temp_db <- tempfile(fileext = ".duckdb")
   con <- DBI::dbConnect(duckdb::duckdb(), dbdir = temp_db)
@@ -33,11 +33,11 @@ create_test_db <- function() {
   return(temp_db)
 }
 
-# Add mock response helpers at the top of your file
+# Keep your mock response helpers
 mock_census_response <- function() {
   list(
     content = charToRaw(jsonlite::toJSON(list(
-      c("state", "county", "county subdivision", "Total"),
+      c("state", "county", "county subdivision", "P0010001"),
       c("34", "001", "00100", "1000")
     ))),
     status_code = 200
@@ -45,24 +45,20 @@ mock_census_response <- function() {
 }
 
 mock_geo_data <- function() {
-  structure(
-    list(
-      COUNTYFP = "001",
-      NAME = "Test County",
-      COUSUBFP = "00100",
-      municipality_name = "Test City",
-      county_name = "Test County"
-    ),
-    class = c("sf", "data.frame")
+  data.frame(
+    COUNTYFP = "001",
+    NAME = "Test County",
+    COUSUBFP = "00100",
+    municipality_name = "Test City",
+    county_name = "Test County",
+    stringsAsFactors = FALSE
   )
 }
 
-# Your existing test with invalid year check
 test_that("process_census_data handles invalid year gracefully", {
   expect_error(process_census_data(2000), "Invalid year")
 })
 
-# Modified test with mocking
 test_that("process_census_data writes correct tables", {
   skip_on_cran()
 
@@ -70,31 +66,30 @@ test_that("process_census_data writes correct tables", {
   mock_get <- mock(mock_census_response())
   mock_geo_ref <- mock(mock_geo_data())
 
-  with_mock(
-    "httr::GET" = mock_get,
-    "get_nj_geo_reference" = mock_geo_ref,
-    {
-      temp_db <- create_test_db()
-      withr::with_envvar(
-        new = c("CENSUS_DB_PATH" = temp_db),
-        code = {
-          process_census_data(2020)
-          con <- DBI::dbConnect(duckdb::duckdb(), temp_db)
-          on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
+  # Create local bindings
+  local_mocked_bindings(
+    GET = mock_get,
+    get_nj_geo_reference = mock_geo_ref
+  )
 
-          tables <- DBI::dbListTables(con)
-          expect_true(
-            any(grepl("_2020$", tables)),
-            info = sprintf("Available tables: %s", paste(tables, collapse = ", "))
-          )
-        }
+  temp_db <- create_test_db()
+  withr::with_envvar(
+    new = c("CENSUS_DB_PATH" = temp_db),
+    code = {
+      process_census_data(2020)
+      con <- DBI::dbConnect(duckdb::duckdb(), temp_db)
+      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
+
+      tables <- DBI::dbListTables(con)
+      expect_true(
+        any(grepl("_2020$", tables)),
+        info = sprintf("Available tables: %s", paste(tables, collapse = ", "))
       )
-      unlink(temp_db)
     }
   )
+  unlink(temp_db)
 })
 
-# Keep your other existing tests
 test_that("process_census_data writes correct tables", {
   skip_on_cran()
   temp_db <- create_test_db()
@@ -106,18 +101,17 @@ test_that("process_census_data writes correct tables", {
       con <- DBI::dbConnect(duckdb::duckdb(), dbdir = temp_db)
       DBI::dbDisconnect(con, shutdown = TRUE)
 
-      # Use mocking for this part
+      # Use mocking with local_mocked_bindings
       mock_get <- mock(mock_census_response())
       mock_geo_ref <- mock(mock_geo_data())
 
-      with_mock(
-        "httr::GET" = mock_get,
-        "get_nj_geo_reference" = mock_geo_ref,
-        {
-          message("Running process_census_data...")
-          process_census_data(2020)
-        }
+      local_mocked_bindings(
+        GET = mock_get,
+        get_nj_geo_reference = mock_geo_ref
       )
+
+      message("Running process_census_data...")
+      process_census_data(2020)
 
       # Try to connect and check tables
       con <- DBI::dbConnect(duckdb::duckdb(), dbdir = temp_db)
