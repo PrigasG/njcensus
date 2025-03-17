@@ -30,14 +30,17 @@ reference:
   contents:
   - process_pop_estimates
   - get_pop_estimates
+  - print.pop_estimates
 
 - title: "Database Utilities"
   desc: "Functions for managing the database"
   contents:
   - get_db_path
   - set_db_path
+  - setup_logging
 
 - title: "Helper Functions"
   desc: "Utility functions"
   contents:
   - create_spinner
+  - print.census_data
