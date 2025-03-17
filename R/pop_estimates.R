@@ -40,6 +40,39 @@ process_pop_estimates <- function(years = c(2021, 2022, 2023),
     stop("Invalid file type. Must be one of: ", paste(valid_file_types, collapse = ", "))
   }
 
+  # Handle special case for syasex (only available for 2023)
+  if("syasex" %in% file_types && any(years < 2023)) {
+    warning("Single-year age and sex (syasex) files are only available for 2023 and later.")
+    # Filter years for syasex
+    syasex_years <- years[years >= 2023]
+    other_file_types <- setdiff(file_types, "syasex")
+
+    # Process other file types with all years
+    results_other <- list()
+    if(length(other_file_types) > 0) {
+      results_other <- process_pop_estimates(
+        years = years,
+        file_types = other_file_types,
+        state_fips = state_fips,
+        save_to_db = save_to_db
+      )
+    }
+
+    # Process syasex with valid years only
+    results_syasex <- list()
+    if(length(syasex_years) > 0) {
+      results_syasex <- process_pop_estimates(
+        years = syasex_years,
+        file_types = "syasex",
+        state_fips = state_fips,
+        save_to_db = save_to_db
+      )
+    }
+
+    # Combine results
+    return(c(results_other, results_syasex))
+  }
+
   message("Processing population estimates for years: ", paste(years, collapse = ", "))
 
   # Function to download and process a single file
@@ -48,7 +81,8 @@ process_pop_estimates <- function(years = c(2021, 2022, 2023),
     filename <- sprintf("cc-est%s-%s-%s.csv", year, file_type, state_fips)
     file_url <- paste0(base_url, filename)
 
-    message("Downloading ", file_type, " data for ", year, " from ", file_url)
+    # More professional message without URL
+    message("Retrieving ", file_type, " population estimates for ", year)
 
     tryCatch({
       # Download and read the file
@@ -63,7 +97,7 @@ process_pop_estimates <- function(years = c(2021, 2022, 2023),
 
       return(df)
     }, error = function(e) {
-      warning("Error downloading ", file_type, " data for ", year, ": ", e$message)
+      warning("Error retrieving ", file_type, " data for ", year, ": ", e$message)
       return(NULL)
     })
   }
@@ -87,7 +121,7 @@ process_pop_estimates <- function(years = c(2021, 2022, 2023),
           on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
           DBI::dbWriteTable(con, table_name, combined, overwrite = TRUE)
-          message("Successfully wrote ", nrow(combined), " rows to table ", table_name)
+          message("Added ", nrow(combined), " rows of ", ft, " population estimates to database")
         }, error = function(e) {
           warning("Error saving to database: ", e$message)
         })

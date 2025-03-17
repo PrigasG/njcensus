@@ -161,97 +161,101 @@ get_census_data <- function(demographic = NULL,
 
 #' Initialize Census Database
 #'
-#' @description Creates or initializes the census database with both 2010 and 2020 data.
-#' Either uses pre-packaged data (recommended) or fetches from Census API.
+#' @description Creates or initializes the census database with both 2010 and 2020 census data.
+#' Data is fetched from the Census API.
 #'
-#' @param use_packaged_data Logical. If TRUE, uses pre-packaged data. If FALSE, fetches from Census API.
 #' @param worker_threads Integer. Number of threads for parallel processing when fetching from API.
 #' @param memory_limit Character. Memory limit for DuckDB (default: "4GB").
-#' @param include_pop_estimates Logical. Whether to include population estimates data. Default is TRUE.
+#' @param include_pop_estimates Logical. Whether to include population estimates data. Default is FALSE.
 #' @param pop_estimate_years Numeric vector. Years to include for population estimates. Default is c(2021, 2022, 2023).
 #'
 #' @details
-#' The function provides two methods of initializing the census database:
-#' 1. Using pre-packaged data (faster, reliable, no API limits)
-#' 2. Fetching from Census API (for custom updates)
-#'
-#' Pre-packaged data is recommended for most users as:
-#' - It's faster to initialize
-#' - Doesn't depend on API availability
-#' - Avoids API rate limits
-#' - Census data for 2010 and 2020 is static
+#' The function fetches data from the Census API and processes it into a DuckDB database.
+#' - Census data for 2010 and 2020 is always fetched
+#' - Population estimates can be optionally included
 #'
 #' @return None. Creates or initializes the census database.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' # Use pre-packaged data (recommended)
+#' # Initialize with just census data
 #' init_census_data()
 #'
-#' # Fetch fresh data from Census API
-#' init_census_data(use_packaged_data = FALSE)
+#' # Initialize with census data and population estimates
+#' init_census_data(include_pop_estimates = TRUE)
 #'
 #' # Customize API fetch settings
 #' init_census_data(
-#'   use_packaged_data = FALSE,
 #'   worker_threads = 4,
 #'   memory_limit = "8GB"
 #' )
-#'
-#' # Initialize without population estimates
-#' init_census_data(include_pop_estimates = FALSE)
 #' }
-init_census_data <- function(use_packaged_data = TRUE,
-                             worker_threads = parallel::detectCores() - 1,
+init_census_data <- function(worker_threads = parallel::detectCores() - 1,
                              memory_limit = "4GB",
-                             include_pop_estimates = TRUE,
+                             include_pop_estimates = FALSE,
                              pop_estimate_years = c(2021, 2022, 2023)) {
-  if(use_packaged_data) {
-    # Use included database
-    source_db_path <- system.file("extdata", "census_data.duckdb", package = "njcensus")
-    target_db_path <- Sys.getenv("CENSUS_DB_PATH", "census_data.duckdb")
-    if(!file.exists(target_db_path)) {
-      message("Copying packaged census database...")
-      file.copy(source_db_path, target_db_path)
-      message("Census database ready to use at ", target_db_path)
-    } else {
-      message("Using existing census database at ", target_db_path)
-    }
 
-    # Add population estimates if requested
-    if(include_pop_estimates) {
-      message("Processing population estimates data...")
-      process_pop_estimates(years = pop_estimate_years, save_to_db = TRUE)
-    }
-  } else {
-    # Use API to fetch data
-    db_path <- Sys.getenv("CENSUS_DB_PATH", "census_data.duckdb")
-    message("Fetching census data for 2010 and 2020... This may take a few minutes.")
+  # Use API to fetch data
+  db_path <- Sys.getenv("CENSUS_DB_PATH", "census_data.duckdb")
+  db_exists <- file.exists(db_path)
+
+  # Check if database exists and has census tables
+  if(db_exists) {
     tryCatch({
-      con <- dbConnect(duckdb::duckdb(), dbdir = db_path)
-      on.exit(dbDisconnect(con, shutdown = TRUE))
-      # Configure database
-      dbExecute(con, sprintf("SET memory_limit='%s'", memory_limit))
-      dbExecute(con, sprintf("SET threads=%d", worker_threads))
-      # Verify settings
-      actual_memory <- dbGetQuery(con, "SELECT current_setting('memory_limit')")[[1]]
-      message("Configured memory limit: ", actual_memory)
-      # Process data
-      process_census_data(2010)
-      process_census_data(2020)
+      con <- DBI::dbConnect(duckdb::duckdb(), dbdir = db_path)
+      tables <- DBI::dbListTables(con)
+      has_census_tables <- any(grepl("_20(10|20)$", tables))
+      DBI::dbDisconnect(con, shutdown = TRUE)
 
-      # Add population estimates if requested
-      if(include_pop_estimates) {
-        message("Processing population estimates data...")
-        process_pop_estimates(years = pop_estimate_years, save_to_db = TRUE)
+      if(has_census_tables) {
+        message("Using existing census database at ", db_path)
+
+        # Only process population estimates if requested and not already in database
+        if(include_pop_estimates) {
+          has_pop_estimates <- any(grepl("^pop_estimates_", tables))
+
+          if(!has_pop_estimates) {
+            message("Adding population estimates...")
+            process_pop_estimates(years = pop_estimate_years, save_to_db = TRUE)
+          } else {
+            message("Population estimates already exist in database")
+          }
+        }
+
+        return(invisible(NULL))
       }
-
-      message("Census database ready to use at ", db_path)
     }, error = function(e) {
-      stop("Error initializing database: ", e$message)
+      message("Error checking existing database: ", e$message)
+      message("Will create new database")
     })
   }
+
+  # Initialize new database
+  message("Initializing census database...")
+
+  tryCatch({
+    con <- DBI::dbConnect(duckdb::duckdb(), dbdir = db_path)
+    on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
+
+    # Configure database
+    DBI::dbExecute(con, sprintf("SET memory_limit='%s'", memory_limit))
+    DBI::dbExecute(con, sprintf("SET threads=%d", worker_threads))
+
+    # Process decennial census data
+    message("Retrieving decennial census data for 2010 and 2020...")
+    process_census_data(2010)
+    process_census_data(2020)
+    message("Census database initialized successfully")
+
+    # Only add population estimates if explicitly requested
+    if(include_pop_estimates) {
+      message("Adding population estimates...")
+      process_pop_estimates(years = pop_estimate_years, save_to_db = TRUE)
+    }
+  }, error = function(e) {
+    stop("Error initializing database: ", e$message)
+  })
 }
 
 #' Get Database Path
