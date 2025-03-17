@@ -182,6 +182,7 @@ get_pop_estimates <- function(file_type = "agesex",
 #' Print Population Estimates Data
 #' @param x Population estimates data frame
 #' @param ... Additional arguments passed to print
+#' @importFrom utils head
 #' @export
 print.pop_estimates <- function(x, ...) {
   cat("\nPopulation Estimates Data\n")
