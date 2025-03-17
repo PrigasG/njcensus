@@ -16,12 +16,15 @@
 <url><loc>/reference/get_census_data.html</loc></url>
 <url><loc>/reference/get_db_path.html</loc></url>
 <url><loc>/reference/get_nj_geo_reference.html</loc></url>
+<url><loc>/reference/get_pop_estimates.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/init_census_data.html</loc></url>
 <url><loc>/reference/log_with_context.html</loc></url>
 <url><loc>/reference/njcensus-package.html</loc></url>
 <url><loc>/reference/print.census_data.html</loc></url>
+<url><loc>/reference/print.pop_estimates.html</loc></url>
 <url><loc>/reference/process_census_data.html</loc></url>
+<url><loc>/reference/process_pop_estimates.html</loc></url>
 <url><loc>/reference/set_db_path.html</loc></url>
 <url><loc>/reference/setup_logging.html</loc></url>
 <url><loc>/reference/validate_api_response.html</loc></url>

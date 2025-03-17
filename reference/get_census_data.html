@@ -74,7 +74,9 @@ Returns data in a formatted table view for easy reading.</p>
 <span>  demographic <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  gender <span class="op">=</span> <span class="st">"male"</span>,</span>
 <span>  year <span class="op">=</span> <span class="fl">2020</span>,</span>
-<span>  preview_limit <span class="op">=</span> <span class="fl">10</span></span>
+<span>  preview_limit <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  counties <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  municipalities <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -99,6 +101,16 @@ If NULL, returns preview of all groups.</p></dd>
 <dd><p>Numeric. Number of rows to return when no demographic specified.
 Defaults to 10.</p></dd>
 
+
+<dt id="arg-counties">counties<a class="anchor" aria-label="anchor" href="#arg-counties"></a></dt>
+<dd><p>Character vector. County names to filter for. If NULL (default),
+returns data for all counties.</p></dd>
+
+
+<dt id="arg-municipalities">municipalities<a class="anchor" aria-label="anchor" href="#arg-municipalities"></a></dt>
+<dd><p>Character vector. Municipality names to filter for. If NULL (default),
+returns data for all municipalities.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -117,6 +129,12 @@ with formatted printing capabilities.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Get specific data</span></span></span>
 <span class="r-in"><span><span class="va">asian_female_2010</span> <span class="op">&lt;-</span> <span class="fu">get_census_data</span><span class="op">(</span><span class="st">"asian"</span>, <span class="st">"female"</span>, <span class="fl">2010</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Filter by county</span></span></span>
+<span class="r-in"><span><span class="va">atlantic_data</span> <span class="op">&lt;-</span> <span class="fu">get_census_data</span><span class="op">(</span><span class="st">"white"</span>, counties <span class="op">=</span> <span class="st">"Atlantic"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Filter by municipality</span></span></span>
+<span class="r-in"><span><span class="va">jersey_city_data</span> <span class="op">&lt;-</span> <span class="fu">get_census_data</span><span class="op">(</span><span class="st">"white"</span>, municipalities <span class="op">=</span> <span class="st">"Jersey City"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

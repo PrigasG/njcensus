@@ -71,7 +71,9 @@ Either uses pre-packaged data (recommended) or fetches from Census API.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">init_census_data</span><span class="op">(</span></span>
 <span>  use_packaged_data <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  worker_threads <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>,</span>
-<span>  memory_limit <span class="op">=</span> <span class="st">"4GB"</span></span>
+<span>  memory_limit <span class="op">=</span> <span class="st">"4GB"</span>,</span>
+<span>  include_pop_estimates <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  pop_estimate_years <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2021</span>, <span class="fl">2022</span>, <span class="fl">2023</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -89,6 +91,14 @@ Either uses pre-packaged data (recommended) or fetches from Census API.</p>
 
 <dt id="arg-memory-limit">memory_limit<a class="anchor" aria-label="anchor" href="#arg-memory-limit"></a></dt>
 <dd><p>Character. Memory limit for DuckDB (default: "4GB").</p></dd>
+
+
+<dt id="arg-include-pop-estimates">include_pop_estimates<a class="anchor" aria-label="anchor" href="#arg-include-pop-estimates"></a></dt>
+<dd><p>Logical. Whether to include population estimates data. Default is TRUE.</p></dd>
+
+
+<dt id="arg-pop-estimate-years">pop_estimate_years<a class="anchor" aria-label="anchor" href="#arg-pop-estimate-years"></a></dt>
+<dd><p>Numeric vector. Years to include for population estimates. Default is c(2021, 2022, 2023).</p></dd>
 
 </dl></div>
     <div id="value">
@@ -120,6 +130,9 @@ Either uses pre-packaged data (recommended) or fetches from Census API.</p>
 <span class="r-in"><span>  worker_threads <span class="op">=</span> <span class="fl">4</span>,</span></span>
 <span class="r-in"><span>  memory_limit <span class="op">=</span> <span class="st">"8GB"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Initialize without population estimates</span></span></span>
+<span class="r-in"><span><span class="fu">init_census_data</span><span class="op">(</span>include_pop_estimates <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
