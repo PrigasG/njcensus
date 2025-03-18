@@ -207,6 +207,10 @@ get_pop_estimates <- function(file_type = "agesex",
   # Execute query
   result <- DBI::dbGetQuery(con, query)
 
+  # Remove " County" from county names
+  result <- result %>%
+    dplyr::mutate(CTYNAME = gsub(" County$", "", CTYNAME))
+
   # Format result
   class(result) <- unique(c("pop_estimates", class(result)))
 
