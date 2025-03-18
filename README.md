@@ -22,6 +22,10 @@ You can install the development version of njcensus from GitHub with:
 ``` r
 # install.packages("devtools")
 devtools::install_github("PrigasG/njcensus")
+
+#or using this link
+install.packages('https://github.com/PrigasG/njcensus/archive/refs/heads/main.zip',
+repos=NULL, type='source')
 ```
 
 ## Usage
