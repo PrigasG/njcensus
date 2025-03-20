@@ -2,11 +2,11 @@
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/PrigasG/njcensus/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/PrigasG/njcensus/actions/workflows/R-CMD-check.yaml) 
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![GitHub release](https://img.shields.io/github/v/release/PrigasG/njcensus)](https://github.com/PrigasG/njcensus/releases/latest)
 <!-- badges: end -->
 
 ## Overview
-`njcensus` is an R package for downloading, processing, and analyzing New Jersey census demographic data. It supports both 2010 and 2020 census years and provides tools for working with demographic indicators across counties and municipalities. It also includes population estimates data from 2021-2023.
+`njcensus` is an R package for downloading, processing, and analyzing New Jersey census demographic data. It supports both 2010 and 2020 decennial census years and 2020-2023 population estimates. This package provides tools for working with demographic indicators across counties and municipalities.
 
 ## Features
 -   Downloads demographic data from the Census Bureau API
@@ -23,9 +23,10 @@ You can install the development version of njcensus from GitHub with:
 # install.packages("devtools")
 devtools::install_github("PrigasG/njcensus")
 
-#or using this link
-install.packages('https://github.com/PrigasG/njcensus/archive/refs/heads/main.zip',
-repos=NULL, type='source')
+# Install stable release
+install.packages("https://github.com/PrigasG/njcensus/releases/download/v1.0.0/njcensus_1.0.0.tar.gz", 
+                 repos = NULL, 
+                 type = "source")
 ```
 
 ## Usage

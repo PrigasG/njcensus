@@ -1,11 +1,11 @@
 Package: njcensus
 Title: Process New Jersey Census Data
-Version: 0.2.1
+Version: 1.0.0
 Authors@R: 
     person("George", "Arthur", , "george8.arthur9@gmail.com", role = c("aut", "cre"))
 Description: Provides tools for downloading, processing, and analyzing New Jersey census 
-    demographic data. Handles both 2010 and 2020 census years, processes various 
-    demographic indicators, and stores results in a DuckDB database for efficient 
+    demographic data. Handles both 2010 and 2020 census years, 2020-2023 population estimates, 
+    processes various demographic indicators, and stores results in a DuckDB database for efficient 
     querying and analysis.
 License: MIT + file LICENSE
 Encoding: UTF-8
