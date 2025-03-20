@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">njcensus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -107,7 +107,10 @@ ethnicity</li>
 <div class="section level2">
 <h2 id="filtering-data">Filtering Data<a class="anchor" aria-label="anchor" href="#filtering-data"></a>
 </h2>
-<p>The function offers several filtering options: ### By County</p>
+<p>The function offers several filtering options:</p>
+<div class="section level3">
+<h3 id="by-county">By County<a class="anchor" aria-label="anchor" href="#by-county"></a>
+</h3>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get estimates for Atlantic County</span></span>
 <span><span class="va">atlantic</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_pop_estimates.html">get_pop_estimates</a></span><span class="op">(</span>counties <span class="op">=</span> <span class="st">"Atlantic"</span><span class="op">)</span></span>
@@ -116,6 +119,7 @@ ethnicity</li>
 <span><span class="va">south_jersey</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_pop_estimates.html">get_pop_estimates</a></span><span class="op">(</span></span>
 <span>  counties <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Atlantic"</span>, <span class="st">"Cape May"</span>, <span class="st">"Cumberland"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+</div>
 <div class="section level3">
 <h3 id="by-year">By Year<a class="anchor" aria-label="anchor" href="#by-year"></a>
 </h3>
