@@ -1,6 +1,6 @@
 Package: njcensus
 Title: Process New Jersey Census Data
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: 
     person("George", "Arthur", , "george8.arthur9@gmail.com", role = c("aut", "cre"))
 Description: Provides tools for downloading, processing, and analyzing New Jersey census 
